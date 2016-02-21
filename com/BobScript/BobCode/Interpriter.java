@@ -150,7 +150,7 @@ public class Interpriter {
                     StackData b = stack.pop();
                     StackData a = stack.pop();
 
-                    StackData answ = new StackData(null, Type.NULL);
+                    StackData answ;
 
                     if (a.getType() == Type.INT && b.getType() == Type.INT) {
                          answ = new StackData((long)a.getData() + (long)b.getData(), Type.INT);
@@ -170,6 +170,77 @@ public class Interpriter {
                     stack.push(answ);
                 }
                 break;
+
+                case LESSER: {
+                    if (stack.size() < 2) {
+                        Log.printError("ERROR " + currentCommand + "stack size too small");
+                        return -2;
+                    }
+
+                    StackData b = stack.pop();
+                    StackData a = stack.pop();
+
+                    StackData answ = new StackData(null, Type.NULL);
+
+                    if (a.getType() == Type.INT && b.getType() == Type.INT) {
+                        answ = new StackData((long)a.getData() < (long)b.getData(), Type.BOOLEAN);
+                    }
+
+                    stack.push(answ);
+                }
+                break;
+
+                case GREATER: {
+                    if (stack.size() < 2) {
+                        Log.printError("ERROR " + currentCommand + "stack size too small");
+                        return -2;
+                    }
+
+                    StackData b = stack.pop();
+                    StackData a = stack.pop();
+
+                    StackData answ = new StackData(null, Type.NULL);
+
+                    if (a.getType() == Type.INT && b.getType() == Type.INT) {
+                        answ = new StackData((long)a.getData() > (long)b.getData(), Type.BOOLEAN);
+                    }
+
+                    stack.push(answ);
+                }
+                break;
+
+                case CONDITION: {
+                    if (stack.size() < 1) {
+                        Log.printError("ERROR " + currentCommand + "stack size too small");
+                        return -2;
+                    }
+
+                    StackData cond = stack.pop();
+                    if (cond.getType() != Type.BOOLEAN) {
+                        Log.printError("ERROR " + cond + " condition must be boolean");
+                        return -1;
+                    }
+
+
+                    if (!(boolean)cond.getData()) {
+                        commandIndex += Integer.parseInt(currentCommand.getArgs()[0]);
+                        continue;
+                    }
+                }
+                break;
+
+                case GOTO: {
+                    //System.out.println(">> " + commandIndex);
+                    commandIndex += Integer.parseInt(currentCommand.getArgs()[0]);
+                    continue;
+                }
+
+                case OUTPUT: {
+                    StackData tp = stack.pop();
+                    System.out.print(tp.getData());
+                }
+                break;
+
             }
 
             commandIndex++;
