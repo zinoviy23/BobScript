@@ -7,6 +7,9 @@ import java.util.Map;
 
 /**
  * Created by zinov on 20.02.2016.
+ *
+ * class for elements of stack
+ * type and data
  */
 
 

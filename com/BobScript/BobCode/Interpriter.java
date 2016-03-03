@@ -6,6 +6,8 @@ import java.util.Map;
 
 /**
  * Created by zinov on 20.02.2016.
+ *
+ *  execute class, that run compiled code
  */
 public class Interpriter {
     private Stack<StackData> stack;
@@ -61,7 +63,7 @@ public class Interpriter {
         return s.substring(1, s.length() - 1);
     }
 
-
+    // run commands
     public int execute(Command[] program) {
         for (Command c : program) {
             System.out.println(c);
@@ -125,7 +127,7 @@ public class Interpriter {
                     }
 
                     StackData sd = stack.pop();
-                    varibles.get(args[0]).assignCopy(sd);
+                    varibles.get(args[0]).assignCopy(sd);   // assign to copy for simple types
                 }
                 break;
 
@@ -165,6 +167,24 @@ public class Interpriter {
                     } else {
                         Log.printError("ERROR: operator + not defined for " + a.toString() + " " + b.toString());
                         return -1;
+                    }
+
+                    stack.push(answ);
+                }
+                break;
+
+                case MULT: {
+                    if (stack.size() < 2) {
+                        Log.printError("Error: stack size too small");
+                        return -2;
+                    }
+
+                    StackData b = stack.pop();
+                    StackData a = stack.pop();
+                    StackData answ = new StackData();
+                    if (a.getType() == Type.INT && b.getType() == Type.INT) {
+                        long tmpA = Long.parseLong(a.getData().toString()), tmpB = Long.parseLong(b.getData().toString());
+                        answ = new StackData(tmpA * tmpB, Type.INT);
                     }
 
                     stack.push(answ);
@@ -235,7 +255,7 @@ public class Interpriter {
                     continue;
                 }
 
-                case OUTPUT: {
+                case OUTPUT: {    // bad command
                     StackData tp = stack.pop();
                     System.out.print(tp.getData());
                 }
