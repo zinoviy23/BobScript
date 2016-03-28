@@ -1,5 +1,7 @@
 package com.BobScript.BobCode;
 
+import com.BobScript.Parsing.Parser;
+
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Map;
@@ -9,13 +11,13 @@ import java.util.Map;
  *
  *  execute class, that run compiled code
  */
-public class Interpriter {
+public class Interpreter {
     private Stack<StackData> stack;
-    private Map<String, Varible> varibles;
+    private Map<String, Variable> variables;
 
-    public Interpriter() {
+    public Interpreter() {
         stack = new Stack<>();
-        varibles = new HashMap<>();
+        variables = new HashMap<>();
     }
 
 
@@ -50,7 +52,7 @@ public class Interpriter {
     }
 
     public static boolean tryConstString(String s) {
-        return s.length() > 1 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"';
+        return s.length() > 1 && s.charAt(0) == '\'' && s.charAt(s.length() - 1) == '\'';
     }
 
     public static boolean tryBoolean(String s) {
@@ -93,8 +95,8 @@ public class Interpriter {
                         stack.add(new StackData(Boolean.parseBoolean(args[0]), Type.BOOLEAN));
                     } else if (tryNull(args[0])) {
                         stack.add(new StackData(null, Type.NULL));
-                    } else if (varibles.containsKey(args[0])) {
-                        stack.add(varibles.get(args[0]).clone());
+                    } else if (variables.containsKey(args[0])) {
+                        stack.add(variables.get(args[0]).clone());
                     } else {
                         Log.printError("ERROR: " + currentCommand + "unknown type");
                     }
@@ -104,12 +106,12 @@ public class Interpriter {
                 case CREATE: {
                     String[] args = currentCommand.getArgs();
 
-                    if (varibles.containsKey(args)) {
+                    if (variables.containsKey(args)) {
                         Log.printError("ERROR: " + currentCommand + "this varible has been created");
                         return -1;
                     }
 
-                    varibles.put(args[0], new Varible());
+                    variables.put(args[0], new Variable());
                 }
                 break;
 
@@ -121,25 +123,24 @@ public class Interpriter {
                         return -2;
                     }
 
-                    if (!varibles.containsKey(args[0])) {
-                        Log.printError("ERROR" + currentCommand + "unknown name");
-                        return -1;
+                    if (!variables.containsKey(args[0])) {
+                        variables.put(args[0], new Variable());
                     }
 
                     StackData sd = stack.pop();
-                    varibles.get(args[0]).assignCopy(sd);   // assign to copy for simple types
+                    variables.get(args[0]).assignCopy(sd);   // assign to copy for simple types
                 }
                 break;
 
                 case DELETE: {
                     String[] args = currentCommand.getArgs();
 
-                    if (!varibles.containsKey(args[0])) {
+                    if (!variables.containsKey(args[0])) {
                         Log.printError("ERROR " + args[0] + "unknown name");
                         return -1;
                     }
 
-                    varibles.remove(args[0]);
+                    variables.remove(args[0]);
                 }
                 break;
 
@@ -212,7 +213,7 @@ public class Interpriter {
 
                 case GREATER: {
                     if (stack.size() < 2) {
-                        Log.printError("ERROR " + currentCommand + "stack size too small");
+                        Log.printError("ERROR " + currentCommand + " stack size too small");
                         return -2;
                     }
 
@@ -229,6 +230,25 @@ public class Interpriter {
                 }
                 break;
 
+                case EQUAL: {
+                    if (stack.size() < 2) {
+                        Log.printError("ERROR " + currentCommand + " stack size too small");
+                        return -2;
+                    }
+
+                    StackData b = stack.pop();
+                    StackData a = stack.pop();
+
+                    StackData answ = new StackData(null, Type.NULL);
+
+                    if (a.getType() == Type.INT && b.getType() == Type.INT) {
+                        long tmpA = (long)a.getData(), tmpB = (long)b.getData();
+                        answ = new StackData(tmpA == tmpB, Type.BOOLEAN);
+                    }
+
+                    stack.push(answ);
+                } break;
+
                 case CONDITION: {
                     if (stack.size() < 1) {
                         Log.printError("ERROR " + currentCommand + "stack size too small");
@@ -241,26 +261,34 @@ public class Interpriter {
                         return -1;
                     }
 
-
                     if (!(boolean)cond.getData()) {
-                        commandIndex += Integer.parseInt(currentCommand.getArgs()[0]);
-                        continue;
+                        int tmp = -1, balance = 0;
+                        for (int ind = commandIndex; ind < program.length; ind++) {
+                            if (program[ind].getCommand() == Commands.CONDITION) {
+                                balance++;
+                            }
+                            else if (program[ind].getCommand() == Commands.END_CONDITION) {
+                                balance--;
+                            }
+                            if (balance == 0) {
+                                tmp = ind + 1;
+                                break;
+                            }
+                        }
+                        if (tmp != -1) {
+                            commandIndex = tmp;
+                            continue;
+                        }
+                        Log.printError("Error: no condition end");
+                        return -1;
                     }
                 }
                 break;
 
                 case GOTO: {
-                    //System.out.println(">> " + commandIndex);
                     commandIndex += Integer.parseInt(currentCommand.getArgs()[0]);
                     continue;
                 }
-
-                case OUTPUT: {    // bad command
-                    StackData tp = stack.pop();
-                    System.out.print(tp.getData());
-                }
-                break;
-
             }
 
             commandIndex++;
@@ -273,7 +301,7 @@ public class Interpriter {
         return stack;
     }
 
-    public Map<String, Varible> getVaribles() {
-        return varibles;
+    public Map<String, Variable> getVariables() {
+        return variables;
     }
 }

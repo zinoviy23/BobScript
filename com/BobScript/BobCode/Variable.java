@@ -5,9 +5,9 @@ import com.BobScript.BobCode.StackData;
 /**
  * Created by zinov on 20.02.2016.
  */
-public class Varible extends StackData {
+public class Variable extends StackData {
 
-    public Varible() {
+    public Variable() {
         super();
     }
 

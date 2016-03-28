@@ -11,7 +11,7 @@ import java.util.Stack;
  */
 public class Operand {
     private ArrayList <Token> tokens;
-    public static String[] keywords = {"var"};
+    public static String[] keywords = {"var", "if", "end", "while", "function"};
     private static Set<String> keywordsSet;
 
     public Operand() {
@@ -81,8 +81,11 @@ public class Operand {
                     ind++;
                 }
                 String currentOperand = operand.substring(i, ind);
-                addToken(currentOperand, Token.TokenTypes.DELIMITER,
-                        getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
+                if (currentOperand.equals(","))
+                    addToken(currentOperand, Token.TokenTypes.DELIMITER, 0);
+                else
+                    addToken(currentOperand, Token.TokenTypes.DELIMITER,
+                            getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
                 i = ind - 1;
             }
             else if (operand.charAt(i) == '\'')  // if " go to next " and this str is Const String
@@ -91,7 +94,7 @@ public class Operand {
                 while (ind < operand.length() && operand.charAt(ind) != '\'') {
                     ind++;
                 }
-                String currentOperand = operand.substring(i + 1, ind);
+                String currentOperand = operand.substring(i, ind + 1);
                 addToken(currentOperand, Token.TokenTypes.CONST_STRING,
                         getOperatorPriority(currentOperand, false) + pr);
                 i = ind;
@@ -119,8 +122,8 @@ public class Operand {
         Operand newOp = new Operand();
         for (int i = start; i <= end; i++)
         {
-            newOp.addToken(tokens.get(start));
-            tokens.remove(start);
+            newOp.addToken(tokens.get(i).copy());
+            tokens.get(i).setUsed();
         }
 
         return newOp;
@@ -129,9 +132,27 @@ public class Operand {
     public Operand extractFromParenthesis(int open, int close) {
         if (!get(open).isOpenParenthesis() || !get(close).isCloseParenthesis())
             return new Operand();
-        tokens.remove(open);
-        tokens.remove(close - 1);
-        return extractFrom(open, close - 2);
+        //tokens.remove(open);
+        //tokens.remove(close - 1);
+        return extractFrom(open + 1, close - 1);
+    }
+
+    public Operand[] split() {
+        ArrayList<Operand> ret = new ArrayList<>();
+        int start = 0;
+        int end = -1;
+        for (int i = 0; i < tokens.size(); i++)
+            if (tokens.get(i).getToken().equals(",")) {
+                end = i - 1;
+                ret.add(this.extractFrom(start, end));
+                start = i + 1;
+            }
+
+        if (start < tokens.size()) {
+            ret.add(this.extractFrom(start, tokens.size() - 1));
+        }
+
+        return ret.toArray(new Operand[ret.size()]);
     }
 
     // return index of max priority token
@@ -171,7 +192,7 @@ public class Operand {
     }
 
     public boolean isLastDelimiter() {
-        return tokens.size() < 1 || tokens.get(tokens.size() - 1).isDelimiter();
+        return tokens.size() < 1 || tokens.get(tokens.size() - 1).isDelimiter() || tokens.get(tokens.size() - 1).isKeyword();
     }
 
     @Override
@@ -194,6 +215,8 @@ public class Operand {
             case '.':
             case '=':
             case '*':
+            case '<':
+            case '>':
                 return true;
         }
         return false;
@@ -214,7 +237,7 @@ public class Operand {
         return false;
     }
 
-    public static boolean isSpace(char c) { return c == ' '; }
+    public static boolean isSpace(char c) { return c == ' ' || c == '\t'; }
 
     public static boolean isLatter(char c) { return (c >= 'a' && c <= 'z') || (c <= 'A' && c >= 'Z') || (c == '_'); }
 
@@ -230,13 +253,16 @@ public class Operand {
         if (s.equals("."))
             return 11;
 
+        if (s.equals("<") || s.equals(">") || s.equals("=="))
+            return 3;
+
         if (s.equals("="))
-            return 12;
+            return 19;
 
         if (isKeyword(s))
             return 1000;
 
-        return 10;
+        return 1;
     }
 
     public static Token.TokenTypes getType(String s) {

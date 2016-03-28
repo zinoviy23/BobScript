@@ -39,9 +39,9 @@ public class StackData {
         return new String(stringBuilder);
     }
 
-    public static String setToString(Set <Varible> set) {
+    public static String setToString(Set <Variable> set) {
         String str = "{";
-        Iterator <Varible> it = set.iterator();
+        Iterator <Variable> it = set.iterator();
         while (it.hasNext()) {
             str += it.next().toString();
             if (it.hasNext())
@@ -51,12 +51,12 @@ public class StackData {
         return str;
     }
 
-    public static String mapToString(Map <Varible, Varible> map) {
+    public static String mapToString(Map <Variable, Variable> map) {
         String str = "{";
-        Iterator <Map.Entry<Varible, Varible>> it = map.entrySet().iterator();
+        Iterator <Map.Entry<Variable, Variable>> it = map.entrySet().iterator();
 
         while (it.hasNext()) {
-            Map.Entry<Varible, Varible> now = it.next();
+            Map.Entry<Variable, Variable> now = it.next();
             str += now.getKey().toString() + ": " + now.getValue().toString();
             if (it.hasNext())
                 str += ", ";
@@ -76,7 +76,7 @@ public class StackData {
             case STRING:
                 return new StackData(cloneString((String)data), type);
             case ARRAY:
-                return new StackData(((ArrayList<Varible>)data).clone(), type);
+                return new StackData(((ArrayList<Variable>)data).clone(), type);
             default:
                 return new StackData(data, type);
         }

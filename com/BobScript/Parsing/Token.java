@@ -59,4 +59,8 @@ public class Token {
     public String toString() {
         return "[" + token + ", " + type.toString() + ", " + priority + "]";
     }
+
+    public Token copy() {
+        return new Token(token, type, priority);
+    }
 }

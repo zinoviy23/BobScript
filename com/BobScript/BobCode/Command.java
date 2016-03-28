@@ -10,11 +10,6 @@ public class Command {
     private Commands cmd;
     private String[] args;
 
-    public Command(int val, String args) {
-        this.args = args.split(" ");
-        cmd = Commands.toCommands(val);
-    }
-
     public Command(Commands cmd, String args) {
         this.args = args.split(" ");
         this.cmd = cmd;
