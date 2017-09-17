@@ -32,7 +32,7 @@ public enum Type {
     }
 
     public boolean isCopy() {
-        if (this == INT && this == NULL && this == DOUBLE)
+        if (this == INT || this == NULL || this == DOUBLE)
             return true;
         return false;
     }

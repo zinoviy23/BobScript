@@ -67,9 +67,9 @@ public class Interpreter {
 
     // run commands
     public int execute(Command[] program) {
-        for (Command c : program) {
+        /*for (Command c : program) {
             System.out.println(c);
-        }
+        }*/
         int commandIndex = 0;
         while (commandIndex < program.length) {
             Command currentCommand = program[commandIndex];

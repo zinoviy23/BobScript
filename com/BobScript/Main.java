@@ -3,9 +3,7 @@ package com.BobScript;
 import com.BobScript.BobCode.*;
 import com.BobScript.Parsing.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Main {
@@ -18,14 +16,17 @@ public class Main {
         String line = "";
         Parser compiler = new Parser();
         while ((line = reader.readLine()) != null) {
-            System.out.println(new Operand(line));
             compiler.compile(new Operand(line));
         }
+
+        PrintWriter tmpWriter = new PrintWriter(new File("bobcode.bbc"));
         Command[] cmd = compiler.getProgram();
         for (Command c : cmd) {
-            System.out.println(c);
+            tmpWriter.println(c);
         }
-        /*Interpreter inter = new Interpreter();
+        tmpWriter.close();
+
+        Interpreter inter = new Interpreter();
         Log.init();
         Log.printError("BobScript v " + BOB_SCRIPT_VERSION);
         long start = System.currentTimeMillis();
@@ -33,13 +34,11 @@ public class Main {
         double time = ((double)System.currentTimeMillis() - start) / 1000;
         Log.printError(Double.toString(time));
         Log.end();
+
         Set <Map.Entry<String, Variable>> kek = inter.getVariables().entrySet();
-        Iterator<Map.Entry<String, Variable>> it = kek.iterator();
-
-        while (it.hasNext()) {
-            Map.Entry<String, Variable> v = it.next();
+        for (Map.Entry<String, Variable> v: kek) {
             System.out.println(v.getKey() + " " + v.getValue());
+        }
 
-        }*/
     }
 }
