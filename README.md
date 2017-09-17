@@ -1,5 +1,6 @@
 # BobScript
 Script Language
 
-var не нужен
+** пока идёт разработка **
+
 
