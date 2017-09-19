@@ -2,6 +2,7 @@ package com.BobScript;
 
 import com.BobScript.BobCode.*;
 import com.BobScript.Parsing.*;
+import com.BobScript.Parsing.AbstraxtSyntaxTree.TreeParser;
 
 import java.io.*;
 import java.util.*;
@@ -10,9 +11,8 @@ public class Main {
 
     final static String BOB_SCRIPT_VERSION = "0.0.0";
 
-    // лоооол
     public static void main(String[] args) throws IOException {
-        System.out.println(Arrays.toString(args));
+        /*System.out.println(Arrays.toString(args));
         BufferedReader reader = new BufferedReader(new FileReader("kek.txt"));
         String line = "";
         Parser compiler = new Parser();
@@ -43,6 +43,8 @@ public class Main {
         Set <Map.Entry<String, Variable>> kek = inter.getVariables().entrySet();
         for (Map.Entry<String, Variable> v: kek) {
             System.out.println(v.getKey() + " " + v.getValue());
-        }
+        }*/
+        TreeParser parser = new TreeParser();
+        parser.createNode(new Operand("10 * (1 + 3) + (1 * 2 + 9)")).debugPrint(0);
     }
 }

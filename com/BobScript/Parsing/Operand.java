@@ -19,6 +19,10 @@ public class Operand {
         tokens = new ArrayList<>();
     }
 
+    public ArrayList<Token> getTokens() {
+        return tokens;
+    }
+
     // make array of tokens from string
     public Operand(String operand) {
         initKeywords();
@@ -154,6 +158,14 @@ public class Operand {
         }
 
         return ret.toArray(new Operand[ret.size()]);
+    }
+
+    public void remove(int i) {
+        tokens.remove(i);
+    }
+
+    public void set(int i, Token t) {
+        tokens.set(i, t);
     }
 
     // return index of max priority token
