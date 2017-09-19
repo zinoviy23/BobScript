@@ -19,10 +19,6 @@ public class Operand {
         tokens = new ArrayList<>();
     }
 
-    public ArrayList<Token> getTokens() {
-        return tokens;
-    }
-
     // make array of tokens from string
     public Operand(String operand) {
         initKeywords();
@@ -47,7 +43,7 @@ public class Operand {
             else if (operand.charAt(i) == '(') {
                 if (isLastDelimiter()) {
                     isFunctionParenthesis.push(false);
-                    pr += 20;
+                    pr += 100;
                 }
                 else {
                     isFunctionParenthesis.push(true);
@@ -56,7 +52,7 @@ public class Operand {
             }
             else if (operand.charAt(i) == ')') {
                 if (!isFunctionParenthesis.peek()) {
-                    pr -= 20;
+                    pr -= 100;
                     parenthesisCounter += 1;
                 }
                 else {
@@ -86,9 +82,9 @@ public class Operand {
                     ind++;
                 }
                 String currentOperand = operand.substring(i, ind);
-                //if (currentOperand.equals(","))
-                    //addToken(currentOperand, Token.TokenTypes.DELIMITER, 0);
-                //else
+                if (currentOperand.equals(","))
+                    addToken(currentOperand, Token.TokenTypes.DELIMITER, 0);
+                else
                     addToken(currentOperand, Token.TokenTypes.DELIMITER,
                             getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
                 i = ind - 1;
@@ -158,14 +154,6 @@ public class Operand {
         }
 
         return ret.toArray(new Operand[ret.size()]);
-    }
-
-    public void remove(int i) {
-        tokens.remove(i);
-    }
-
-    public void set(int i, Token t) {
-        tokens.set(i, t);
     }
 
     // return index of max priority token
@@ -238,7 +226,7 @@ public class Operand {
     public static boolean isDelimiter(String s) {
         if (s.length() == 1)
             return isDelimiter(s.charAt(0));
-        return s.equals("<=") || s.equals(">=") || s.equals("==");
+        return s.equals("<=") || s.equals(">=");
     }
 
     public static boolean isKeyword(String s) {
@@ -267,13 +255,10 @@ public class Operand {
             return 11;
 
         if (s.equals("<") || s.equals(">") || s.equals("=="))
-            return 4;
-
-        if (s.equals("="))
             return 3;
 
-        if (s.equals(","))
-            return 2;
+        if (s.equals("="))
+            return 19;
 
         if (isKeyword(s))
             return 1000;
