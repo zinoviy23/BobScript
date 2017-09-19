@@ -23,7 +23,7 @@ public class Operand {
     public Operand(String operand) {
         initKeywords();
         tokens = new ArrayList<>();
-
+        int parenthesisCounter = 1;
         Stack <Boolean> isFunctionParenthesis = new Stack<>();
         int pr = 0;
         for (int i = 0; i < operand.length(); i++) {
@@ -53,6 +53,7 @@ public class Operand {
             else if (operand.charAt(i) == ')') {
                 if (!isFunctionParenthesis.peek()) {
                     pr -= 100;
+                    parenthesisCounter += 1;
                 }
                 else {
                     addToken(")", Token.TokenTypes.DELIMITER, pr);
@@ -239,7 +240,7 @@ public class Operand {
 
     public static boolean isSpace(char c) { return c == ' ' || c == '\t'; }
 
-    public static boolean isLatter(char c) { return (c >= 'a' && c <= 'z') || (c <= 'A' && c >= 'Z') || (c == '_'); }
+    public static boolean isLatter(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_'); }
 
     public static boolean isDigit(char c) { return c >= '0' && c <= '9'; }
 

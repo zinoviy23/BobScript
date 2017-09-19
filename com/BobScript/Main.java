@@ -16,9 +16,12 @@ public class Main {
         BufferedReader reader = new BufferedReader(new FileReader("kek.txt"));
         String line = "";
         Parser compiler = new Parser();
+        PrintWriter tokenWriter = new PrintWriter("tokens.txt");
         while ((line = reader.readLine()) != null) {
+            tokenWriter.println(new Operand(line));
             compiler.compile(new Operand(line));
         }
+        tokenWriter.close();
 
         PrintWriter tmpWriter = new PrintWriter(new File("bobcode.bbc"));
         Command[] cmd = compiler.getProgram();
