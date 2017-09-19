@@ -119,9 +119,10 @@ public class Parser {
                         Operand somthing = line.extractFromParenthesis(index + 2, line.getCloseParenthesis(index + 2));
                         Operand[] arguments = somthing.split();
                         //System.out.println("BOB: " +somthing);
-                        for (Operand kek : arguments)
+                        for (Operand kek : arguments) {
                             //compile(kek);
-                            System.out.println( "BOB: " +kek);
+                            System.out.println("BOB: " + kek);
+                        }
                         compiledProgram.add(new Command(Commands.CALL, b.getToken()));
                     } else
                         compiledProgram.add(new Command(Commands.PUSH, b.getToken()));

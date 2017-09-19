@@ -10,6 +10,7 @@ public class Main {
 
     final static String BOB_SCRIPT_VERSION = "0.0.0";
 
+    // лоооол
     public static void main(String[] args) throws IOException {
         System.out.println(Arrays.toString(args));
         BufferedReader reader = new BufferedReader(new FileReader("kek.txt"));
@@ -35,10 +36,10 @@ public class Main {
         Log.printError(Double.toString(time));
         Log.end();
 
+        System.out.println("\nVariables: ");
         Set <Map.Entry<String, Variable>> kek = inter.getVariables().entrySet();
         for (Map.Entry<String, Variable> v: kek) {
             System.out.println(v.getKey() + " " + v.getValue());
         }
-
     }
 }
