@@ -45,6 +45,6 @@ public class Main {
             System.out.println(v.getKey() + " " + v.getValue());
         }*/
         TreeParser parser = new TreeParser();
-        parser.createNode(new Operand("10 * (1 + 3) + (1 * 2 + 9)")).debugPrint(0);
+        parser.createNode(new Operand("a = (15 * 3.1 + 1 == 10 * (7 - 3))")).debugPrint(0);
     }
 }

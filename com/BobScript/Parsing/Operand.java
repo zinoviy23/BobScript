@@ -238,7 +238,7 @@ public class Operand {
     public static boolean isDelimiter(String s) {
         if (s.length() == 1)
             return isDelimiter(s.charAt(0));
-        return s.equals("<=") || s.equals(">=");
+        return s.equals("<=") || s.equals(">=") || s.equals("==");
     }
 
     public static boolean isKeyword(String s) {

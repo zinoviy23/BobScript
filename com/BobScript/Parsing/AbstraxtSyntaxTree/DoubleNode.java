@@ -1,25 +1,25 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree;
 
-public class IntNode extends TreeNode {
-    private long value;
+public class DoubleNode extends TreeNode {
+    private double value;
 
-    public IntNode(long value) {
+    public DoubleNode(double value) {
         this.value = value;
     }
 
-    public long getValue() {
+    public double getValue() {
         return value;
     }
 
     @Override
     public String toString() {
-        return Long.toString(value) + ": int";
+        return Double.toString(value) + ": double";
     }
 
     @Override
     public void debugPrint(int level) {
         for (int i = 0; i < level; i++)
             System.out.print("  ");
-        System.out.println(value + ": int");
+        System.out.println(value + ": double");
     }
 }
