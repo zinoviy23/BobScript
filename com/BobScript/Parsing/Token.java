@@ -5,7 +5,7 @@ package com.BobScript.Parsing;
  */
 public class Token {
     public enum TokenTypes {
-        DELIMITER, NONE, NUMBER, CONST_STRING, KEYWORD;
+        DELIMITER, NONE, NUMBER, CONST_STRING, KEYWORD, FOR_PARSING;
 
         @Override
         public String toString() {
@@ -20,6 +20,8 @@ public class Token {
                     return "const string";
                 case KEYWORD:
                     return "keyword";
+                case FOR_PARSING:
+                    return "for parsing";
                 default:
                     return "";
             }
@@ -38,9 +40,9 @@ public class Token {
         this.type = TokenTypes.NONE;
     }
 
-    String getToken() { return token; }
-    int getPriority() { return priority; }
-    TokenTypes getType() { return type; }
+    public String getToken() { return token; }
+    public int getPriority() { return priority; }
+    public TokenTypes getType() { return type; }
 
 
     public boolean isDelimiter() { return type == TokenTypes.DELIMITER; }
@@ -49,6 +51,7 @@ public class Token {
     public boolean isKeyword() { return type == TokenTypes.KEYWORD; }
     public boolean isOpenParenthesis() { return token.equals("("); }
     public boolean isCloseParenthesis() { return token.equals(")"); }
+    public boolean isForParsing() { return type == TokenTypes.FOR_PARSING; }
     public void setUsed() {priority = 0;}
 
     private String token;
