@@ -10,6 +10,7 @@ public class Main {
 
     final static String BOB_SCRIPT_VERSION = "0.0.0";
 
+    // лоооол
     public static void main(String[] args) throws IOException {
         System.out.println(Arrays.toString(args));
         BufferedReader reader = new BufferedReader(new FileReader("kek.txt"));
