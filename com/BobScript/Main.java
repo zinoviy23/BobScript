@@ -36,10 +36,10 @@ public class Main {
         Log.printError(Double.toString(time));
         Log.end();
 
+        System.out.println("\nVariables: ");
         Set <Map.Entry<String, Variable>> kek = inter.getVariables().entrySet();
         for (Map.Entry<String, Variable> v: kek) {
             System.out.println(v.getKey() + " " + v.getValue());
         }
-
     }
 }

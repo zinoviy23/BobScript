@@ -4,7 +4,7 @@ package com.BobScript.BobCode;
  * Created by zinov on 20.02.2016.
  */
 public enum Commands {
-    EXIT, PUSH, ASSIGN, CREATE, DELETE, ADD, SUB, LESSER, GREATER, EQUAL, CONDITION, END_CONDITION, GOTO, MULT,
+    EXIT, PUSH, ASSIGN, DELETE, ADD, SUB, LESSER, GREATER, EQUAL, CONDITION, END_CONDITION, GOTO, MULT,
         FUNCTION, ARG_COUNT, ARGUMENT, CALL, END_FUNCTION;
 
     @Override
@@ -14,8 +14,6 @@ public enum Commands {
                 return "exit";
             case PUSH:
                 return "push";
-            case CREATE:
-                return "create";
             case DELETE:
                 return "delete";
             case ASSIGN:

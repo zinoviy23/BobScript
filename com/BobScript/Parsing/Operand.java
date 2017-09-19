@@ -43,7 +43,7 @@ public class Operand {
             else if (operand.charAt(i) == '(') {
                 if (isLastDelimiter()) {
                     isFunctionParenthesis.push(false);
-                    pr += 20;
+                    pr += 100;
                 }
                 else {
                     isFunctionParenthesis.push(true);
@@ -52,7 +52,7 @@ public class Operand {
             }
             else if (operand.charAt(i) == ')') {
                 if (!isFunctionParenthesis.peek()) {
-                    pr -= 20;
+                    pr -= 100;
                 }
                 else {
                     addToken(")", Token.TokenTypes.DELIMITER, pr);
