@@ -20,7 +20,6 @@ public class Interpreter {
         variables = new HashMap<>();
     }
 
-
     public static boolean isDigit(char c) {
         return '0' <= c && c <= '9';
     }
@@ -65,11 +64,89 @@ public class Interpreter {
         return s.substring(1, s.length() - 1);
     }
 
+    // класс для добавления в стек
+    private class PushAction implements CommandAction {
+        @Override
+        public int Action(String[] args, Command currentCommand) {
+            if (tryInt(args[0])) {
+                stack.add(new StackData(Long.parseLong(args[0]), Type.INT));
+            } else if (tryDouble(args[0])) {
+                stack.add(new StackData(Double.parseDouble(args[0]), Type.DOUBLE));
+            } else if (tryConstString(args[0])) {
+                stack.add(new StackData(toConstString(args[0]), Type.STRING));
+            } else if (tryBoolean(args[0])) {
+                stack.add(new StackData(Boolean.parseBoolean(args[0]), Type.BOOLEAN));
+            } else if (tryNull(args[0])) {
+                stack.add(new StackData(null, Type.NULL));
+            } else if (variables.containsKey(args[0])) {
+                stack.add(variables.get(args[0]).clone());
+            } else {
+                Log.printError("ERROR: " + currentCommand + "unknown type");
+                return -1;
+            }
+            return 0;
+        }
+    }
+
+    private class AssignAction implements CommandAction {
+        @Override
+        public int Action(String[] args, Command currentCommand) {
+            if (stack.size() < 1) {
+                Log.printError("ERROR: " + currentCommand + "stack size too small");
+                return -2;
+            }
+
+            if (!variables.containsKey(args[0])) {
+                variables.put(args[0], new Variable());
+            }
+
+            StackData sd = stack.pop();
+            variables.get(args[0]).assignCopy(sd);
+
+            return 0;
+        }
+    }
+
+    private class AddAction implements CommandAction {
+        @Override
+        public int Action(String[] args, Command currentCommand) {
+            if (stack.size() < 2) {
+                Log.printError("ERROR " + currentCommand + "stack size too small");
+                return -2;
+            }
+
+            StackData b = stack.pop();
+            StackData a = stack.pop();
+
+            StackData answ;
+
+            if (a.getType() == Type.INT && b.getType() == Type.INT) {
+                answ = new StackData((long)a.getData() + (long)b.getData(), Type.INT);
+            } else if ((a.getType() == Type.DOUBLE && b.getType() == Type.DOUBLE)
+                    || (a.getType() == Type.DOUBLE && b.getType() == Type.INT)
+                    || (a.getType() == Type.INT && b.getType() == Type.DOUBLE)) {
+
+                double tmpA = Double.parseDouble(a.getData().toString()), tmpB = Double.parseDouble(b.getData().toString());
+                answ = new StackData(tmpA + tmpB, Type.DOUBLE);
+            } else if (a.getType() == Type.STRING && b.getType() == Type.STRING) {
+                answ = new StackData((String)a.getData() + (String)b.getData(), Type.STRING);
+            } else {
+                Log.printError("ERROR: operator + not defined for " + a.toString() + " " + b.toString());
+                return -1;
+            }
+
+            stack.push(answ);
+
+            return 0;
+        }
+    }
+
     // run commands
     public int execute(Command[] program) {
-        /*for (Command c : program) {
-            System.out.println(c);
-        }*/
+        PushAction pushAction = new PushAction();
+        AssignAction assignAction = new AssignAction();
+        AddAction addAction = new AddAction();
+
         int commandIndex = 0;
         while (commandIndex < program.length) {
             Command currentCommand = program[commandIndex];
@@ -82,27 +159,11 @@ public class Interpreter {
                     return 0;
                 }
 
-                case PUSH: {
-                    String[] args = currentCommand.getArgs();
-
-                    if (tryInt(args[0])) {
-                        stack.add(new StackData(Long.parseLong(args[0]), Type.INT));
-                    } else if (tryDouble(args[0])) {
-                        stack.add(new StackData(Double.parseDouble(args[0]), Type.DOUBLE));
-                    } else if (tryConstString(args[0])) {
-                        stack.add(new StackData(toConstString(args[0]), Type.STRING));
-                    } else if (tryBoolean(args[0])) {
-                        stack.add(new StackData(Boolean.parseBoolean(args[0]), Type.BOOLEAN));
-                    } else if (tryNull(args[0])) {
-                        stack.add(new StackData(null, Type.NULL));
-                    } else if (variables.containsKey(args[0])) {
-                        stack.add(variables.get(args[0]).clone());
-                    } else {
-                        Log.printError("ERROR: " + currentCommand + "unknown type");
-                    }
-                }
+                case PUSH:
+                    pushAction.Action(currentCommand.getArgs(), currentCommand);
                 break;
 
+                // deprecated
                 case CREATE: {
                     String[] args = currentCommand.getArgs();
 
@@ -115,21 +176,8 @@ public class Interpreter {
                 }
                 break;
 
-                case ASSIGN: {
-                    String[] args = currentCommand.getArgs();
-
-                    if (stack.size() < 1) {
-                        Log.printError("ERROR: " + currentCommand + "stack size too small");
-                        return -2;
-                    }
-
-                    if (!variables.containsKey(args[0])) {
-                        variables.put(args[0], new Variable());
-                    }
-
-                    StackData sd = stack.pop();
-                    variables.get(args[0]).assignCopy(sd);   // assign to copy for simple types
-                }
+                case ASSIGN:
+                    assignAction.Action(currentCommand.getArgs(), currentCommand);
                 break;
 
                 case DELETE: {
@@ -144,34 +192,8 @@ public class Interpreter {
                 }
                 break;
 
-                case ADD: {
-                    if (stack.size() < 2) {
-                        Log.printError("ERROR " + currentCommand + "stack size too small");
-                        return -2;
-                    }
-
-                    StackData b = stack.pop();
-                    StackData a = stack.pop();
-
-                    StackData answ;
-
-                    if (a.getType() == Type.INT && b.getType() == Type.INT) {
-                         answ = new StackData((long)a.getData() + (long)b.getData(), Type.INT);
-                    } else if ((a.getType() == Type.DOUBLE && b.getType() == Type.DOUBLE)
-                            || (a.getType() == Type.DOUBLE && b.getType() == Type.INT)
-                            || (a.getType() == Type.INT && b.getType() == Type.DOUBLE)) {
-
-                        double tmpA = Double.parseDouble(a.getData().toString()), tmpB = Double.parseDouble(b.getData().toString());
-                        answ = new StackData(tmpA + tmpB, Type.DOUBLE);
-                    } else if (a.getType() == Type.STRING && b.getType() == Type.STRING) {
-                        answ = new StackData((String)a.getData() + (String)b.getData(), Type.STRING);
-                    } else {
-                        Log.printError("ERROR: operator + not defined for " + a.toString() + " " + b.toString());
-                        return -1;
-                    }
-
-                    stack.push(answ);
-                }
+                case ADD:
+                    addAction.Action(currentCommand.getArgs(), currentCommand);
                 break;
 
                 case MULT: {
