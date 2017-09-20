@@ -1,5 +1,5 @@
 # BobScript
-#### Butter on Bread Script
+#### _Butter on Bread Script_
 Script Language
 
 **пока идёт разработка**
