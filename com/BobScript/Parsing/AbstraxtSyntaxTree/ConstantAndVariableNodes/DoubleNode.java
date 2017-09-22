@@ -1,4 +1,6 @@
-package com.BobScript.Parsing.AbstraxtSyntaxTree;
+package com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes;
+
+import com.BobScript.Parsing.AbstraxtSyntaxTree.TreeNode;
 
 public class DoubleNode extends TreeNode {
     private double value;
@@ -18,8 +20,7 @@ public class DoubleNode extends TreeNode {
 
     @Override
     public void debugPrint(int level) {
-        for (int i = 0; i < level; i++)
-            System.out.print("  ");
-        System.out.println(value + ": double");
+        drawLevel(level);
+        debugWriter.println(value + ": double");
     }
 }

@@ -2,6 +2,8 @@ package com.BobScript;
 
 import com.BobScript.BobCode.*;
 import com.BobScript.Parsing.*;
+import com.BobScript.Parsing.AbstraxtSyntaxTree.FileNode;
+import com.BobScript.Parsing.AbstraxtSyntaxTree.TreeNode;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.TreeParser;
 
 import java.io.*;
@@ -44,7 +46,34 @@ public class Main {
         for (Map.Entry<String, Variable> v: kek) {
             System.out.println(v.getKey() + " " + v.getValue());
         }*/
+        TreeNode.initDebugWriter("tree.txt");
         TreeParser parser = new TreeParser();
-        parser.createNode(new Operand("a = (15 * 3.1 + 1 == 10 * (7 - 3))")).debugPrint(0);
+        /*parser.createNode(new Operand("while a < 10"));
+        parser.createNode(new Operand("b = 10 * 3 + 1 - 2"));
+        parser.createNode(new Operand("c = 10 < 5 + 345 == 50.1"));
+        parser.createNode(new Operand("if a == 5"));
+        parser.createNode(new Operand("a = 6"));
+        parser.createNode(new Operand("end"));
+        parser.createNode(new Operand("while c < 0"));
+        parser.createNode(new Operand("c = 10"));
+        parser.createNode(new Operand("end"));
+        parser.createNode(new Operand("end")).debugPrint(0);
+        //parser.createNode(new Operand("a, b, c, d + 1")).debugPrint(0); */
+
+        BufferedReader reader = new BufferedReader(new FileReader("kek.txt"));
+        String line = "";
+        PrintWriter tokenWriter = new PrintWriter("tokens.txt");
+        FileNode root = new FileNode("kek.txt");
+        while ((line = reader.readLine()) != null) {
+            Operand tmp = new Operand(line);
+            tokenWriter.println(tmp);
+            TreeNode newTreeNode = parser.createNode(tmp);
+            if (newTreeNode != null)
+                root.addToBody(newTreeNode);
+        }
+        root.debugPrint(0);
+        tokenWriter.close();
+        TreeNode.deleteDebugWriter();
+
     }
 }

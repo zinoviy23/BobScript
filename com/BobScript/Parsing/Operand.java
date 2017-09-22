@@ -47,7 +47,7 @@ public class Operand {
             else if (operand.charAt(i) == '(') {
                 if (isLastDelimiter()) {
                     isFunctionParenthesis.push(false);
-                    pr += 100;
+                    pr += 20;
                 }
                 else {
                     isFunctionParenthesis.push(true);
@@ -56,7 +56,7 @@ public class Operand {
             }
             else if (operand.charAt(i) == ')') {
                 if (!isFunctionParenthesis.peek()) {
-                    pr -= 100;
+                    pr -= 20;
                     parenthesisCounter += 1;
                 }
                 else {
@@ -86,9 +86,9 @@ public class Operand {
                     ind++;
                 }
                 String currentOperand = operand.substring(i, ind);
-                if (currentOperand.equals(","))
-                    addToken(currentOperand, Token.TokenTypes.DELIMITER, 0);
-                else
+                //if (currentOperand.equals(","))
+                    //addToken(currentOperand, Token.TokenTypes.DELIMITER, 0);
+                //else
                     addToken(currentOperand, Token.TokenTypes.DELIMITER,
                             getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
                 i = ind - 1;
@@ -267,10 +267,13 @@ public class Operand {
             return 11;
 
         if (s.equals("<") || s.equals(">") || s.equals("=="))
-            return 3;
+            return 4;
 
         if (s.equals("="))
-            return 19;
+            return 3;
+
+        if (s.equals(","))
+            return 2;
 
         if (isKeyword(s))
             return 1000;

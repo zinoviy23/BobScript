@@ -37,9 +37,8 @@ public class OperationNode extends TreeNode {
 
     @Override
     public void debugPrint(int level) {
-        for (int i = 0; i < level; i++)
-            System.out.print("  ");
-        System.out.println(operation + ":");
+        drawLevel(level);
+        debugWriter.println(operation + ":");
         left.debugPrint(level + 1);
         right.debugPrint(level + 1);
 
