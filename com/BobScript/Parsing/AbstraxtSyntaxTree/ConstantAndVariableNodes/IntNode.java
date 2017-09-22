@@ -1,4 +1,6 @@
-package com.BobScript.Parsing.AbstraxtSyntaxTree;
+package com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes;
+
+import com.BobScript.Parsing.AbstraxtSyntaxTree.TreeNode;
 
 public class IntNode extends TreeNode {
     private long value;
@@ -18,8 +20,7 @@ public class IntNode extends TreeNode {
 
     @Override
     public void debugPrint(int level) {
-        for (int i = 0; i < level; i++)
-            System.out.print("  ");
-        System.out.println(value + ": int");
+        drawLevel(level);
+        debugWriter.println(value + ": int");
     }
 }

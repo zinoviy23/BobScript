@@ -12,6 +12,7 @@ import com.BobScript.BobCode.Log;
  *
  * class for compiling to BobCode
  */
+@Deprecated
 public class Parser {
     private ArrayList<Command> compiledProgram;
     private Stack<Mark> marks;
