@@ -1,12 +1,17 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree;
 
+import com.BobScript.BobCode.Command;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public abstract class TreeNode {
     public abstract void debugPrint(int level);
 
     private static final String LEVEL = "----";
+
+    public abstract Command[] compile();
 
     protected static PrintWriter debugWriter;
 
@@ -31,6 +36,15 @@ public abstract class TreeNode {
     public static void deleteDebugWriter() {
         if (debugWriter != null)
             debugWriter.close();
+    }
+
+    public static Command[] arrayListToArray(ArrayList<Command> arrayList) {
+        Command[] ret = new Command[arrayList.size()];
+
+        for (int i = 0; i < arrayList.size(); i++)
+            ret[i] = arrayList.get(i);
+
+        return ret;
     }
 
 }

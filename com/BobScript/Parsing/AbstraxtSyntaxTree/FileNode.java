@@ -1,6 +1,9 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree;
 
+import com.BobScript.BobCode.Command;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class FileNode extends ComplexNode {
     private ArrayList<TreeNode> body;
@@ -24,5 +27,14 @@ public class FileNode extends ComplexNode {
         for (TreeNode tn : body) {
             tn.debugPrint(level + 1);
         }
+    }
+
+    @Override
+    public Command[] compile() {
+        ArrayList<Command> res = new ArrayList<>();
+        for (TreeNode tn : body)
+            res.addAll(Arrays.asList(tn.compile()));
+
+        return arrayListToArray(res);
     }
 }

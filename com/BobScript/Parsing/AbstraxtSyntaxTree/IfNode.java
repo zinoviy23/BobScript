@@ -1,6 +1,10 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree;
 
+import com.BobScript.BobCode.Command;
+import com.BobScript.BobCode.Commands;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class IfNode extends ComplexNode {
     private ArrayList<TreeNode> body;
@@ -28,5 +32,22 @@ public class IfNode extends ComplexNode {
         debugWriter.println("Body: ");
         for (TreeNode tn : body)
             tn.debugPrint(level + 1);
+    }
+
+    @Override
+    public Command[] compile() {
+        ArrayList<Command> res = new ArrayList<>();
+
+        Command[] conditionCommands = condition.compile();
+
+        res.addAll(Arrays.asList(conditionCommands));
+        res.add(new Command(Commands.CONDITION, ""));
+
+        for (TreeNode tn : body)
+            res.addAll(Arrays.asList(tn.compile()));
+
+        res.add(new Command(Commands.END_CONDITION, ""));
+
+        return arrayListToArray(res);
     }
 }

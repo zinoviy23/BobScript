@@ -44,4 +44,9 @@ public class TypeSupport {
     public static String toConstString(String s) {
         return s.substring(1, s.length() - 1);
     }
+
+    public static boolean isArithmeticOperation(String s) {
+        return s.equals("+") || s.equals("*") || s.equals("-") || s.equals("/") ||
+                s.equals("<") || s.equals(">") || s.equals("==");
+    }
 }

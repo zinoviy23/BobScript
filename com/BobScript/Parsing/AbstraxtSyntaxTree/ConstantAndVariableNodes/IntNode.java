@@ -1,5 +1,7 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes;
 
+import com.BobScript.BobCode.Command;
+import com.BobScript.BobCode.Commands;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.TreeNode;
 
 public class IntNode extends TreeNode {
@@ -22,5 +24,10 @@ public class IntNode extends TreeNode {
     public void debugPrint(int level) {
         drawLevel(level);
         debugWriter.println(value + ": int");
+    }
+
+    @Override
+    public Command[] compile() {
+        return new Command[] {new Command(Commands.PUSH, Long.toString(value))};
     }
 }

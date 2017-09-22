@@ -76,7 +76,7 @@ public class Interpreter {
     public static boolean isDigit(char c) {
         return '0' <= c && c <= '9';
     }
-    
+
 
     // класс для добавления в стек
     private class PushAction implements CommandAction {
