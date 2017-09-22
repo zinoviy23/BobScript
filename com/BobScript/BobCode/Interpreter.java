@@ -5,6 +5,7 @@ import com.BobScript.Parsing.Parser;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Map;
+import com.BobScript.Support.*;
 
 /**
  * Created by zinov on 20.02.2016.
@@ -75,60 +76,21 @@ public class Interpreter {
     public static boolean isDigit(char c) {
         return '0' <= c && c <= '9';
     }
-
-    public static boolean tryInt(String s) {
-        for (int i = 0; i < s.length(); i++)
-            if (!isDigit(s.charAt(i)))
-                return false;
-
-        return true;
-    }
-
-    public static boolean tryDouble(String s) {
-        boolean point = false;
-        for (int i = 0; i < s.length(); i++) {
-            if (!isDigit(s.charAt(i)))
-                if (s.charAt(i) != '.')
-                    return false;
-                else if (i == s.length() - 1)
-                    return false;
-                else if (point)
-                    return false;
-                else {
-                    point = true;
-                }
-        }
-
-        return true;
-    }
-
-    public static boolean tryConstString(String s) {
-        return s.length() > 1 && s.charAt(0) == '\'' && s.charAt(s.length() - 1) == '\'';
-    }
-
-    public static boolean tryBoolean(String s) {
-        return s.equals("true") || s.equals("false");
-    }
-
-    public static boolean tryNull(String s) { return s.equals("null"); }
-
-    public static String toConstString(String s) {
-        return s.substring(1, s.length() - 1);
-    }
+    
 
     // класс для добавления в стек
     private class PushAction implements CommandAction {
         @Override
         public CommandResult Action(String[] args, Command currentCommand) {
-            if (tryInt(args[0])) {
+            if (TypeSupport.tryInt(args[0])) {
                 stack.add(new StackData(Long.parseLong(args[0]), Type.INT));
-            } else if (tryDouble(args[0])) {
+            } else if (TypeSupport.tryDouble(args[0])) {
                 stack.add(new StackData(Double.parseDouble(args[0]), Type.DOUBLE));
-            } else if (tryConstString(args[0])) {
-                stack.add(new StackData(toConstString(args[0]), Type.STRING));
-            } else if (tryBoolean(args[0])) {
+            } else if (TypeSupport.tryConstString(args[0])) {
+                stack.add(new StackData(TypeSupport.toConstString(args[0]), Type.STRING));
+            } else if (TypeSupport.tryBoolean(args[0])) {
                 stack.add(new StackData(Boolean.parseBoolean(args[0]), Type.BOOLEAN));
-            } else if (tryNull(args[0])) {
+            } else if (TypeSupport.tryNull(args[0])) {
                 stack.add(new StackData(null, Type.NULL));
             } else if (variables.containsKey(args[0])) {
                 stack.add(variables.get(args[0]).clone());

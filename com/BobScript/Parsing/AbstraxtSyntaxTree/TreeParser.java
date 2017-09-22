@@ -1,8 +1,8 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree;
 
-import com.BobScript.BobCode.Interpreter;
 import com.BobScript.Parsing.*;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes.*;
+import com.BobScript.Support.TypeSupport;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -71,15 +71,15 @@ public class TreeParser {
                     TreeNode nodeLeft, nodeRight;
 
                     if (!left.isForParsing()) {
-                        if (Interpreter.tryInt(left.getToken()))
+                        if (TypeSupport.tryInt(left.getToken()))
                             nodeLeft = new IntNode(Long.parseLong(left.getToken()));
-                        else if (Interpreter.tryDouble(left.getToken()))
+                        else if (TypeSupport.tryDouble(left.getToken()))
                             nodeLeft = new DoubleNode(Double.parseDouble(left.getToken()));
-                        else if (Interpreter.tryConstString(left.getToken()))
+                        else if (TypeSupport.tryConstString(left.getToken()))
                             nodeLeft = new ConstStringNode(left.getToken());
-                        else if (Interpreter.tryNull(left.getToken()))
+                        else if (TypeSupport.tryNull(left.getToken()))
                             nodeLeft = new NullNode();
-                        else if (Interpreter.tryBoolean(left.getToken()))
+                        else if (TypeSupport.tryBoolean(left.getToken()))
                             nodeLeft = new BooleanNode(left.getToken().equals("true"));
                         else
                             nodeLeft = new VariableNode(left.getToken());
@@ -89,15 +89,15 @@ public class TreeParser {
                     }
 
                     if (!right.isForParsing()) {
-                        if (Interpreter.tryInt(right.getToken()))
+                        if (TypeSupport.tryInt(right.getToken()))
                             nodeRight = new IntNode(Long.parseLong(right.getToken()));
-                        else if (Interpreter.tryDouble(right.getToken()))
+                        else if (TypeSupport.tryDouble(right.getToken()))
                             nodeRight = new DoubleNode(Double.parseDouble(right.getToken()));
-                        else if (Interpreter.tryConstString(right.getToken()))
+                        else if (TypeSupport.tryConstString(right.getToken()))
                             nodeRight = new ConstStringNode(right.getToken());
-                        else if (Interpreter.tryNull(right.getToken()))
+                        else if (TypeSupport.tryNull(right.getToken()))
                             nodeRight = new NullNode();
-                        else if (Interpreter.tryBoolean(right.getToken()))
+                        else if (TypeSupport.tryBoolean(right.getToken()))
                             nodeRight = new BooleanNode(right.getToken().equals("true"));
                         else
                             nodeRight = new VariableNode(right.getToken());
