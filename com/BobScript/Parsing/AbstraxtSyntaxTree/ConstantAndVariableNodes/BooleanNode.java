@@ -19,6 +19,6 @@ public class BooleanNode extends TreeNode {
 
     @Override
     public Command[] compile() {
-        return new Command[] {new Command(Commands.PUSH, Boolean.toString(value))};
+        return new Command[] {new Command(Commands.PUSH, 'b', value)};
     }
 }

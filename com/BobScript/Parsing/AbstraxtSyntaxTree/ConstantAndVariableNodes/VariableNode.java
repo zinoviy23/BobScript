@@ -28,6 +28,6 @@ public class VariableNode extends TreeNode {
 
     @Override
     public Command[] compile() {
-        return new Command[] {new Command(Commands.PUSH, name)};
+        return new Command[] {new Command(Commands.PUSH, 'v', name)};
     }
 }

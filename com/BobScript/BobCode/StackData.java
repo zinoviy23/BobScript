@@ -22,13 +22,24 @@ public class StackData {
         this.type = type;
     }
 
+    public void assignCopy(StackData sd) {
+        StackData newValue = sd.clone();
+        data = newValue.getData();
+        type = newValue.getType();
+    }
+
+    public void assignPointer(StackData sd) {
+        data = sd.getData();
+        type = sd.getType();
+    }
+
     public StackData() {
         this.data = null;
         this.type = Type.NULL;
     }
 
-    Object getData() { return data; }
-    Type getType() { return type; }
+    public Object getData() { return data; }
+    public Type getType() { return type; }
 
 
     public static String cloneString(String str) {

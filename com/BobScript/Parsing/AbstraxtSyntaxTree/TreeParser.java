@@ -20,9 +20,7 @@ public class TreeParser {
 
     public TreeNode createNode(Operand line) {
         tmp.clear();
-        //System.out.println(line);
         TreeNode tmpRes = init(line);
-        //System.out.print(tmpRes + " " + currentParent.size());
         if (currentParent.empty())
             return tmpRes;
         else {
@@ -30,7 +28,6 @@ public class TreeParser {
             if (currentParent.peek() == tmpRes) {
                 currentParent.pop();
             }
-            //System.out.println(" " + currentParent.size());
             if (!currentParent.empty()) {
                 if (tmpRes != null)
                     currentParent.peek().addToBody(tmpRes);
@@ -43,6 +40,7 @@ public class TreeParser {
     }
 
     private TreeNode init(Operand line) {
+        //System.out.println(line);
         int index = line.next();
 
         if (line.size() == 0)
@@ -63,7 +61,9 @@ public class TreeParser {
                 case ">":
                 case "==":
                 case "=":
-                case ",":{
+                case "+=":
+                case ",":
+                case ".":{
                     Token left = line.get(index - 1);
                     Token right = line.get(index + 1);
 
@@ -116,6 +116,50 @@ public class TreeParser {
                     tmp.add(operation);
                     return init(line);
                 }
+                case "(": {
+                    int closeIndex = line.getCloseParenthesis(index);
+                    Token nameToken = line.get(index - 1);
+                    Operand arguments = line.extractFromParenthesis(index, closeIndex);
+                    FunctionCallNode fcn = new FunctionCallNode(nameToken.getToken());
+                    TreeNode kek = init(arguments);
+                    //kek.debugPrint(0);
+                    fcn.setComaNode(kek);
+                    line.removeAll(index - 1, closeIndex);
+                    line.set(index - 1, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                    tmp.add(fcn);
+                    //fcn.debugPrint(0);
+                    return init(line);
+                }
+                case "[": {
+                    int closeIndex = line.getCloseBoxParenthesis(index);
+                    Operand elements = line.extractFromParenthesis(index, closeIndex);
+                    if (index > 0 && !line.get(index - 1).isDelimiter()) {
+                        TreeNode name;
+                        if (line.get(index - 1).isForParsing()) {
+                            name = tmp.get(Integer.parseInt(line.get(index - 1).getToken()));
+                        }
+                        else {
+                            name = new VariableNode(line.get(index - 1).getToken());
+                        }
+                        ArrayElementNode aen = new ArrayElementNode(name);
+                        TreeNode indexes = init(elements);
+                        aen.setComaNode(indexes);
+                        line.removeAll(index - 1, closeIndex);
+                        line.set(index - 1, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                        tmp.add(aen);
+                    }
+                    else {
+                        //System.out.println(index + " " + closeIndex);
+                        //System.out.println(elements);
+                        ConstArrayNode can = new ConstArrayNode();
+                        TreeNode elementsNode = init(elements);
+                        can.setComaNode(elementsNode);
+                        line.removeAll(index, closeIndex);
+                        line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                        tmp.add(can);
+                    }
+                    return init(line);
+                }
             }
         }
         else if (tk.isKeyword()) {
@@ -134,12 +178,42 @@ public class TreeParser {
                     return null;
                 }
 
+                case "function": {
+                    String name = line.get(index + 1).getToken();
+                    FunctionDeclarationNode fdn = new FunctionDeclarationNode(name);
+                    int closeIndex = line.getCloseParenthesis(index + 2);
+                    Operand arguments = line.extractFromParenthesis(index + 2, closeIndex);
+                    for (int i = 0; i < arguments.size(); i++) {
+                        if (!arguments.get(i).getToken().equals(","))
+                            fdn.addArgument(arguments.get(i).getToken());
+                    }
+                    currentParent.push(fdn);
+                    line.removeAll(index, closeIndex);
+                    return null;
+                }
+
                 case "end": {
                     return currentParent.peek();
                 }
             }
+        } else {
+            TreeNode node;
+            if (TypeSupport.tryInt(tk.getToken()))
+                node = new IntNode(Long.parseLong(tk.getToken()));
+            else if (TypeSupport.tryDouble(tk.getToken()))
+                node = new DoubleNode(Double.parseDouble(tk.getToken()));
+            else if (TypeSupport.tryConstString(tk.getToken()))
+                node = new ConstStringNode(tk.getToken());
+            else if (TypeSupport.tryNull(tk.getToken()))
+                node = new NullNode();
+            else if (TypeSupport.tryBoolean(tk.getToken()))
+                node = new BooleanNode(tk.getToken().equals("true"));
+            else
+                node = new VariableNode(tk.getToken());
+            return node;
         }
 
         return null;
     }
+
 }

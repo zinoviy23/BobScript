@@ -28,6 +28,6 @@ public class DoubleNode extends TreeNode {
 
     @Override
     public Command[] compile() {
-        return new Command[] {new Command(Commands.PUSH, Double.toString(value))};
+        return new Command[] {new Command(Commands.PUSH, 'f', value)};
     }
 }

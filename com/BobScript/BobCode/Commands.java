@@ -5,7 +5,7 @@ package com.BobScript.BobCode;
  */
 public enum Commands {
     EXIT, PUSH, ASSIGN, DELETE, ADD, SUB, LESSER, GREATER, EQUAL, CONDITION, END_CONDITION, GOTO, MULT,
-        FUNCTION, ARG_COUNT, ARGUMENT, CALL, END_FUNCTION;
+        FUNCTION, ARG_COUNT, ARGUMENT, CALL, END_FUNCTION, ASSIGN_ADD, CREATE_ARRAY, CREATE_OR_PUSH, GET_FROM;
 
     @Override
     public String toString() {
@@ -46,6 +46,14 @@ public enum Commands {
                 return "end_function";
             case CALL:
                 return "call";
+            case ASSIGN_ADD:
+                return "assign_add";
+            case CREATE_ARRAY:
+                return "create_array";
+            case CREATE_OR_PUSH:
+                return "create_or_push";
+            case GET_FROM:
+                return "get_from";
         }
 
         return "";

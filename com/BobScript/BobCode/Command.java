@@ -8,16 +8,17 @@ import java.util.StringTokenizer;
 
 public class Command {
     private Commands cmd;
-    private String[] args;
+    private Object[] args;
 
-    public Command(Commands cmd, String args) {
-        this.args = args.split(" ");
+    public Command(Commands cmd, Object... params) {
         this.cmd = cmd;
+        args = params;
     }
 
     Commands getCommand() { return cmd; }
-    String[] getArgs() { return args; }
+    Object[] getArgs() { return args; }
 
+    @Deprecated
     public static String stringTokenizerToString(StringTokenizer st) {
         String str = "";
         while (st.hasMoreTokens()) {
@@ -31,11 +32,12 @@ public class Command {
 
     @Override
     public String toString() {
-        String str = "";
-        str += cmd.toString() + " ";
-        for (int i = 0; i < args.length; i++)
-            str += args[i] + " ";
+        StringBuilder sb = new StringBuilder("");
+        sb.append(cmd).append(" ");
+        if (args != null)
+            for (int i = 0; i < args.length; i++)
+                sb.append(args[i]).append(" ");
 
-        return str;
+        return sb.toString();
     }
 }

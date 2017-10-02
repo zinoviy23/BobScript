@@ -8,5 +8,5 @@ package com.BobScript.BobCode;
  */
 
 public interface CommandAction {
-    CommandResult Action(String[] args, Command currentCommand);
+    CommandResult Action(Command currentCommand);
 }

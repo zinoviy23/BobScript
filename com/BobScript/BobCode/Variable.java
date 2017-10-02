@@ -11,16 +11,6 @@ public class Variable extends StackData {
         super();
     }
 
-    public void assignCopy(StackData sd) {
-        StackData newValue = sd.clone();
-        data = newValue.getData();
-        type = newValue.getType();
-    }
-
-    public void assignPointer(StackData sd) {
-        data = sd.getData();
-        type = sd.getType();
-    }
 
     @Override
     public StackData clone() {

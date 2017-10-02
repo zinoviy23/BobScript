@@ -20,6 +20,6 @@ public class ConstStringNode extends TreeNode {
 
     @Override
     public Command[] compile() {
-        return new Command[] {new Command(Commands.PUSH, "'" + value + "'")};
+        return new Command[] {new Command(Commands.PUSH, 's',"'" + value + "'")};
     }
 }

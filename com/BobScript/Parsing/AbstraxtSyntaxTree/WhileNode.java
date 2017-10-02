@@ -47,7 +47,7 @@ public class WhileNode extends ComplexNode {
         for (TreeNode tn : body)
             res.addAll(Arrays.asList(tn.compile()));
 
-        res.add(new Command(Commands.GOTO, Integer.toString(-res.size())));
+        res.add(new Command(Commands.GOTO, -res.size()));
         res.add(new Command(Commands.END_CONDITION, ""));
 
         return arrayListToArray(res);

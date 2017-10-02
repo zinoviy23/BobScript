@@ -49,8 +49,8 @@ public class Token {
     public boolean isNumber() { return type == TokenTypes.NUMBER; }
     public boolean isConstString() { return type == TokenTypes.CONST_STRING; }
     public boolean isKeyword() { return type == TokenTypes.KEYWORD; }
-    public boolean isOpenParenthesis() { return token.equals("("); }
-    public boolean isCloseParenthesis() { return token.equals(")"); }
+    public boolean isOpenParenthesis() { return token.equals("(") || token.equals("["); }
+    public boolean isCloseParenthesis() { return token.equals(")") || token.equals("]"); }
     public boolean isForParsing() { return type == TokenTypes.FOR_PARSING; }
     public void setUsed() {priority = 0;}
 

@@ -14,6 +14,7 @@ public class Main {
     final static String BOB_SCRIPT_VERSION = "0.0.0";
 
     public static void main(String[] args) throws IOException {
+
         TreeNode.initDebugWriter("tree.txt");
         TreeParser parser = new TreeParser();
 
@@ -24,6 +25,7 @@ public class Main {
         while ((line = reader.readLine()) != null) {
             Operand tmp = new Operand(line);
             tokenWriter.println(tmp);
+            tokenWriter.flush();
             TreeNode newTreeNode = parser.createNode(tmp);
             if (newTreeNode != null)
                 root.addToBody(newTreeNode);

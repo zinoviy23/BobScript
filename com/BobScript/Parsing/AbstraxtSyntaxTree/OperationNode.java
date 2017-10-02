@@ -56,12 +56,15 @@ public class OperationNode extends TreeNode {
     @Override
     public Command[] compile() {
         ArrayList<Command> res = new ArrayList<>();
-        if (TypeSupport.isArithmeticOperation(operation))
+        if (!operation.equals("="))
             res.addAll(Arrays.asList(left.compile()));
         res.addAll(Arrays.asList(right.compile()));
         switch (operation) {
             case "+":
                 res.add(new Command(Commands.ADD, ""));
+                break;
+            case "-":
+                res.add(new Command(Commands.SUB, ""));
                 break;
             case "*":
                 res.add(new Command(Commands.MULT, ""));
@@ -76,7 +79,13 @@ public class OperationNode extends TreeNode {
                 res.add(new Command(Commands.EQUAL, ""));
                 break;
             case "=":
-                res.add(new Command(Commands.ASSIGN, ((VariableNode)left).getName()));
+                if (left instanceof VariableNode) {
+                    res.add(0, new Command(Commands.CREATE_OR_PUSH, ((VariableNode)left).getName()));
+                }
+                res.add(new Command(Commands.ASSIGN, ""));
+                break;
+            case "+=":
+                res.add(new Command(Commands.ASSIGN_ADD, ""));
                 break;
         }
         return arrayListToArray(res);

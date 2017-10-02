@@ -28,6 +28,6 @@ public class IntNode extends TreeNode {
 
     @Override
     public Command[] compile() {
-        return new Command[] {new Command(Commands.PUSH, Long.toString(value))};
+        return new Command[] {new Command(Commands.PUSH, 'i', value)};
     }
 }

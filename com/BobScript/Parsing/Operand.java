@@ -1,10 +1,8 @@
 package com.BobScript.Parsing;
 
 import com.sun.istack.internal.NotNull;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
+
+import java.util.*;
 
 /**
  * Created by zinov on 23.02.2016.
@@ -31,6 +29,8 @@ public class Operand {
         Stack <Boolean> isFunctionParenthesis = new Stack<>();
         int pr = 0;
         for (int i = 0; i < operand.length(); i++) {
+            if (operand.charAt(i) == '/' && i < operand.length() - 1 && operand.charAt(i + 1) == '/')
+                break;
             if (isSpace(operand.charAt(i))) {
                 continue;
             }
@@ -51,7 +51,7 @@ public class Operand {
                 }
                 else {
                     isFunctionParenthesis.push(true);
-                    addToken("(", Token.TokenTypes.DELIMITER, pr);
+                    addToken("(", Token.TokenTypes.DELIMITER, pr + 20);
                 }
             }
             else if (operand.charAt(i) == ')') {
@@ -69,6 +69,12 @@ public class Operand {
             }
             else if (operand.charAt(i) == '}') {
                 addToken("}", Token.TokenTypes.DELIMITER, pr);
+            }
+            else if (operand.charAt(i) == '[') {
+                addToken("[", Token.TokenTypes.DELIMITER, pr + 20);
+            }
+            else if (operand.charAt(i) == ']') {
+                addToken("]", Token.TokenTypes.DELIMITER, pr);
             }
             else if (isDigit(operand.charAt(i))) {
                 int ind = i + 1;
@@ -105,6 +111,11 @@ public class Operand {
                 i = ind;
             }
         }
+    }
+
+    public Operand(@NotNull Token[] tokens) {
+        this.tokens = new ArrayList<>();
+        this.tokens.addAll(Arrays.asList(tokens));
     }
 
     public void addToken(@NotNull Token tk) {
@@ -164,6 +175,11 @@ public class Operand {
         tokens.remove(i);
     }
 
+    public void removeAll(int start, int end) {
+        for (int i = start; i < end; i++)
+            remove(start);
+    }
+
     public void set(int i, Token t) {
         tokens.set(i, t);
     }
@@ -204,6 +220,23 @@ public class Operand {
         return -2;
     }
 
+    public int getCloseBoxParenthesis(int openParenthesis) {
+        if (!get(openParenthesis).getToken().equals("["))
+            return -1;
+
+        int balance = 0;
+        for (int i = openParenthesis; i < size(); i++) {
+            if (get(i).getToken().equals("["))
+                balance++;
+            if (get(i).getToken().equals("]"))
+                balance--;
+            if (balance == 0)
+                return i;
+        }
+        System.out.println(balance);
+        return -2;
+    }
+
     public boolean isLastDelimiter() {
         return tokens.size() < 1 || tokens.get(tokens.size() - 1).isDelimiter() || tokens.get(tokens.size() - 1).isKeyword();
     }
@@ -238,7 +271,7 @@ public class Operand {
     public static boolean isDelimiter(String s) {
         if (s.length() == 1)
             return isDelimiter(s.charAt(0));
-        return s.equals("<=") || s.equals(">=") || s.equals("==");
+        return s.equals("<=") || s.equals(">=") || s.equals("==") || s.equals("+=");
     }
 
     public static boolean isKeyword(String s) {
@@ -264,12 +297,12 @@ public class Operand {
             return 15;
 
         if (s.equals("."))
-            return 11;
+            return 30;
 
         if (s.equals("<") || s.equals(">") || s.equals("=="))
             return 4;
 
-        if (s.equals("="))
+        if (s.equals("=") || s.equals("+="))
             return 3;
 
         if (s.equals(","))

@@ -13,6 +13,6 @@ public class NullNode extends TreeNode {
 
     @Override
     public Command[] compile() {
-        return new Command[] {new Command(Commands.PUSH, "null")};
+        return new Command[] {new Command(Commands.PUSH, 'n', null)};
     }
 }
