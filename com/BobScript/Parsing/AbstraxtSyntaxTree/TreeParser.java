@@ -178,7 +178,7 @@ public class TreeParser {
                     return null;
                 }
 
-                case "function": {
+                case "func": {
                     String name = line.get(index + 1).getToken();
                     FunctionDeclarationNode fdn = new FunctionDeclarationNode(name);
                     int closeIndex = line.getCloseParenthesis(index + 2);
@@ -190,6 +190,12 @@ public class TreeParser {
                     currentParent.push(fdn);
                     line.removeAll(index, closeIndex);
                     return null;
+                }
+
+                case "return": {
+                    line.remove(index);
+                    ReturnNode returnNode = new ReturnNode(init(line));
+                    return returnNode;
                 }
 
                 case "end": {

@@ -18,16 +18,17 @@ public class PrintAction extends FunctionAction {
     public void Action(InterpreterInfo info) {
         StackData tmp = info.stack.pop();
         if (tmp.getType() != Type.ARRAY)
-            System.out.println("> " + tmp.getData());
+            //System.out.println("> " + tmp.getData());
+            System.err.println(tmp.getData());
         else {
-            System.out.print("> [");
+            System.err.print("[");
             ArrayList<StackData> array = (ArrayList<StackData>)tmp.getData();
             for (int i = 0; i < array.size(); i++) {
-                System.out.print(array.get(i).getData());
+                System.err.print(array.get(i).getData());
                 if (i != array.size() - 1)
-                    System.out.print(", ");
+                    System.err.print(", ");
             }
-            System.out.println("]");
+            System.err.println("]");
         }
     }
 }

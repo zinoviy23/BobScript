@@ -1,5 +1,6 @@
 package com.BobScript.BobCode;
 
+import com.BobScript.BobCode.Functions.Function;
 import com.BobScript.BobCode.Functions.FunctionAction;
 
 import java.util.HashMap;
@@ -11,7 +12,8 @@ public class InterpreterInfo {
     public Map<String, Variable> variables;
     public int commandIndex;
     public HashMap<String, FunctionAction> functions;
-    public Stack<FunctionAction> functionStack;
+    public Stack<Function> functionStack;
+    public int functionStackSize;
 
     public InterpreterInfo() {
         commandIndex = 0;
@@ -19,5 +21,6 @@ public class InterpreterInfo {
         variables = new HashMap<>();
         functions = new HashMap<>();
         functionStack = new Stack<>();
+        functionStackSize = 0;
     }
 }

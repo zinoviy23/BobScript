@@ -1,6 +1,7 @@
 package com.BobScript;
 
 import com.BobScript.BobCode.*;
+import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.Parsing.*;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.FileNode;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.TreeNode;
@@ -51,9 +52,15 @@ public class Main {
         Log.end();
 
         System.out.println("\nVariables: ");
-        Set <Map.Entry<String, Variable>> kek = inter.getVariables().entrySet();
+        Set<Map.Entry<String, Variable>> kek = inter.getVariables().entrySet();
         for (Map.Entry<String, Variable> v: kek) {
             System.out.println(v.getKey() + " " + v.getValue());
+        }
+
+        System.out.println("\nFunctions: ");
+        Set<Map.Entry<String, FunctionAction>> bob = inter.getFunctions().entrySet();
+        for (Map.Entry<String, FunctionAction> f : bob) {
+            System.out.println(f.getKey() + " " + f.getValue().isBuiltinFunction());
         }
 
         TreeNode.deleteDebugWriter();

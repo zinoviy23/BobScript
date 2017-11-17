@@ -1,5 +1,7 @@
 package com.BobScript.BobCode;
 
+import com.BobScript.BobCode.Functions.BuiltInFunctions.CreateArrayFunctionAction;
+import com.BobScript.BobCode.Functions.BuiltInFunctions.ParseIntAction;
 import com.BobScript.BobCode.Functions.BuiltInFunctions.PrintAction;
 import com.BobScript.BobCode.Functions.BuiltInFunctions.ReadLineAction;
 import com.BobScript.BobCode.Functions.Function;
@@ -7,7 +9,9 @@ import com.BobScript.BobCode.Functions.FunctionAction;
 
 import java.util.*;
 
+import com.BobScript.BobCode.Functions.UsersFunctionAction;
 import com.BobScript.Support.*;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 /**
  * Created by zinov on 20.02.2016.
@@ -27,6 +31,8 @@ public class Interpreter {
     private void initBuiltInFunctions() {
         info.functions.put("print", new PrintAction());
         info.functions.put("readLine", new ReadLineAction());
+        info.functions.put("parseInt", new ParseIntAction());
+        info.functions.put("createArray", new CreateArrayFunctionAction());
     }
 
     // иницилизирует действия команд
@@ -49,13 +55,14 @@ public class Interpreter {
         commandActions[Commands.MULT.ordinal()] = new MultAction();
         commandActions[Commands.FUNCTION.ordinal()] = new FunctionCommandAction();
         commandActions[Commands.ARG_COUNT.ordinal()] = new NothingAction();
-        commandActions[Commands.ARGUMENT.ordinal()] = new NothingAction();
+        commandActions[Commands.ARGUMENT.ordinal()] = new ArgumentAction();
         commandActions[Commands.CALL.ordinal()] = new CallAction();
-        commandActions[Commands.END_FUNCTION.ordinal()] = new NothingAction();
+        commandActions[Commands.END_FUNCTION.ordinal()] = new EndFunctionAction();
         commandActions[Commands.ASSIGN_ADD.ordinal()] = new AssignAddAction();
         commandActions[Commands.CREATE_ARRAY.ordinal()] = new CreateArrayAction();
         commandActions[Commands.CREATE_OR_PUSH.ordinal()] = new CreateOrPushAction();
         commandActions[Commands.GET_FROM.ordinal()] = new GetFromAction();
+        commandActions[Commands.RETURN.ordinal()] = new ReturnAction();
     }
 
     private Command[] currentProgram;
@@ -66,7 +73,9 @@ public class Interpreter {
         currentProgram = program;
         info.commandIndex = 0;
         while (info.commandIndex < program.length) {
+
             currentCommand = program[info.commandIndex];
+            //System.out.println(info.commandIndex + ": " + currentCommand);
             CommandAction currentAction = commandActions[currentCommand.getCommand().ordinal()];
             switch (currentAction.Action(currentCommand)) {
                 case OK:
@@ -126,10 +135,14 @@ public class Interpreter {
                     break;
                 // variable
                 case 'v':
-                    if (info.variables.containsKey(pushData)) {
+                    if (info.variables.containsKey(info.functionStackSize + "#" + pushData)) {
+                        info.stack.add(info.variables.get(info.functionStackSize + "#" + pushData));
+                    } else if (info.variables.containsKey(pushData)) {
                         info.stack.add(info.variables.get(pushData));
                     } else {
+                        System.out.println("lol");
                         Log.printError("Error: " + currentCommand + " nothing variables");
+                        return CommandResult.ERROR;
                     }
                     break;
                 // error
@@ -449,7 +462,22 @@ public class Interpreter {
             FunctionAction tmp = info.functions.get(functionName);
             if (tmp.getArgumentsCount() != (int)currentCommand.getArgs()[1])
                 return CommandResult.ERROR;
-            tmp.Action(info.stack);
+            if (tmp.isBuiltinFunction())
+                tmp.Action(info);
+            else {
+                info.functionStack.push(new Function(info.commandIndex, tmp));
+                info.functionStackSize++;
+                tmp.Action(info);
+            }
+            return CommandResult.OK;
+        }
+    }
+
+    // Добавление аргумента
+    private class ArgumentAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            info.stack.push(new StackData(currentCommand.getArgs()[0], Type.STRING));
             return CommandResult.OK;
         }
     }
@@ -478,11 +506,21 @@ public class Interpreter {
         @Override
         public CommandResult Action(Command currentCommand) {
             String name = (String)currentCommand.getArgs()[0];
-            if (!info.variables.containsKey(name)) {
-                info.variables.put(name, new Variable());
-            }
+            if (info.functionStackSize == 0) {
+                if (!info.variables.containsKey(name)) {
+                    info.variables.put(name, new Variable());
+                }
 
-            info.stack.push(info.variables.get(name));
+                info.stack.push(info.variables.get(name));
+            }
+            else {
+                if (!info.variables.containsKey(info.functionStackSize + "#" + name)) {
+                    info.variables.put(info.functionStackSize + "#" + name, new Variable());
+                    ((UsersFunctionAction)info.functionStack.peek().action).addVariable(info.functionStackSize + "#" + name);
+                }
+
+                info.stack.push(info.variables.get(info.functionStackSize + "#" + name));
+            }
             return CommandResult.OK;
         }
     }
@@ -508,9 +546,50 @@ public class Interpreter {
         }
     }
 
+    // Объявление функции
     private class FunctionCommandAction implements CommandAction {
         @Override
         public CommandResult Action(Command currentCommand) {
+            String name = (String)currentCommand.getArgs()[0];
+            int countArgs = (int)currentCommand.getArgs()[1];
+            ArrayList<String> args = new ArrayList<>();
+            for (int i = 0; i < countArgs; i++)
+                args.add((String)info.stack.pop().data);
+
+            UsersFunctionAction newFunction = new UsersFunctionAction(info.commandIndex + 1, args);
+            if (!info.functions.containsKey(name))
+                info.functions.put(name, newFunction);
+
+            for (int i = info.commandIndex; i < currentProgram.length; i++) {
+                if (currentProgram[i].getCommand() == Commands.END_FUNCTION) {
+                    info.commandIndex = i;
+                    return CommandResult.OK;
+                }
+            }
+
+            return CommandResult.ERROR;
+        }
+    }
+
+    // Завершение функции
+    private class EndFunctionAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            Function function = info.functionStack.pop();
+            ((UsersFunctionAction)function.action).endFunction(info);
+            info.commandIndex = function.returnPosition;
+            info.functionStackSize--;
+            return CommandResult.OK;
+        }
+    }
+
+    private class ReturnAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            Function function = info.functionStack.pop();
+            ((UsersFunctionAction)function.action).endFunction(info);
+            info.commandIndex = function.returnPosition;
+            info.functionStackSize--;
             return CommandResult.OK;
         }
     }
@@ -522,4 +601,6 @@ public class Interpreter {
     public Map<String, Variable> getVariables() {
         return info.variables;
     }
+
+    public Map<String, FunctionAction> getFunctions() { return info.functions; }
 }
