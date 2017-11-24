@@ -7,9 +7,9 @@ Script Language
 текущая версия: __0__     
 
 ## Цели для версии 0.1
-[] for
-[] array
-[] else, elif
-[] break, continue
-[] унарные операции
+- [x] for
+- [ ] array
+- [ ] else, elif
+- [ ] break, continue
+- [ ] унарные операции
 
