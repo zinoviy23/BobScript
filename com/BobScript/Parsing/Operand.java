@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class Operand {
     private ArrayList <Token> tokens;
-    public static String[] keywords = {"var", "if", "end", "while", "func", "return"};
+    public static String[] keywords = {"var", "if", "end", "while", "func", "return", "delete", "for", "array"};
     private static Set<String> keywordsSet;
 
     public Operand() {
@@ -47,7 +47,7 @@ public class Operand {
             else if (operand.charAt(i) == '(') {
                 if (isLastDelimiter()) {
                     isFunctionParenthesis.push(false);
-                    pr += 20;
+                    pr += 40;
                 }
                 else {
                     isFunctionParenthesis.push(true);
@@ -56,7 +56,7 @@ public class Operand {
             }
             else if (operand.charAt(i) == ')') {
                 if (!isFunctionParenthesis.peek()) {
-                    pr -= 20;
+                    pr -= 40;
                     parenthesisCounter += 1;
                 }
                 else {
@@ -153,12 +153,12 @@ public class Operand {
         return extractFrom(open + 1, close - 1);
     }
 
-    public Operand[] split() {
+    public Operand[] split(String del) {
         ArrayList<Operand> ret = new ArrayList<>();
         int start = 0;
         int end = -1;
         for (int i = 0; i < tokens.size(); i++)
-            if (tokens.get(i).getToken().equals(",")) {
+            if (tokens.get(i).getToken().equals(del)) {
                 end = i - 1;
                 ret.add(this.extractFrom(start, end));
                 start = i + 1;
@@ -263,6 +263,8 @@ public class Operand {
             case '*':
             case '<':
             case '>':
+            case ':':
+            case ';':
                 return true;
         }
         return false;
@@ -298,6 +300,8 @@ public class Operand {
 
         if (s.equals("."))
             return 30;
+        if (s.equals(":"))
+            return 31;
 
         if (s.equals("<") || s.equals(">") || s.equals("=="))
             return 4;
@@ -305,7 +309,7 @@ public class Operand {
         if (s.equals("=") || s.equals("+="))
             return 3;
 
-        if (s.equals(","))
+        if (s.equals(",") || s.equals(";"))
             return 2;
 
         if (isKeyword(s))

@@ -63,7 +63,8 @@ public class TreeParser {
                 case "=":
                 case "+=":
                 case ",":
-                case ".":{
+                case ".":
+                case ":": {
                     Token left = line.get(index - 1);
                     Token right = line.get(index + 1);
 
@@ -81,8 +82,12 @@ public class TreeParser {
                             nodeLeft = new NullNode();
                         else if (TypeSupport.tryBoolean(left.getToken()))
                             nodeLeft = new BooleanNode(left.getToken().equals("true"));
-                        else
+                        else {
+                            //System.out.println(left.getToken());
+                            if (left.isDelimiter())
+                                System.out.println("это левый унарный оператор, они пока не поддреживаются");
                             nodeLeft = new VariableNode(left.getToken());
+                        }
                     }
                     else {
                         nodeLeft = tmp.get(Integer.parseInt(left.getToken()));
@@ -153,6 +158,7 @@ public class TreeParser {
                         //System.out.println(elements);
                         ConstArrayNode can = new ConstArrayNode();
                         TreeNode elementsNode = init(elements);
+                        //elementsNode.debugPrint(0);
                         can.setComaNode(elementsNode);
                         line.removeAll(index, closeIndex);
                         line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
@@ -168,6 +174,19 @@ public class TreeParser {
                     line.remove(index);
                     WhileNode whileNode = new WhileNode(init(line));
                     currentParent.push(whileNode);
+                    return null;
+                }
+
+                case "for": {
+                    line.remove(index);
+                    Operand[] statements = line.split(";");
+                    Operand condition = statements[1];
+                    Operand change = statements[2];
+                    Operand initSt = statements[0];
+                    ForNode forNode = new ForNode(init(condition));
+                    forNode.setInitializationState(init(initSt));
+                    forNode.setChangeStatement(init(change));
+                    currentParent.push(forNode);
                     return null;
                 }
 

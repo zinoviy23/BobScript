@@ -6,9 +6,8 @@ import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
-public class PrintAction extends FunctionAction {
+public class PrintlnAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
         return 1;
@@ -18,8 +17,7 @@ public class PrintAction extends FunctionAction {
     public void Action(InterpreterInfo info) {
         StackData tmp = info.stack.pop();
         if (tmp.getType() != Type.ARRAY)
-            //System.out.println("> " + tmp.getData());
-            System.out.print(tmp.getData());
+            System.out.println(tmp.getData());
         else {
             System.out.print("[");
             ArrayList<StackData> array = (ArrayList<StackData>)tmp.getData();
@@ -28,7 +26,7 @@ public class PrintAction extends FunctionAction {
                 if (i != array.size() - 1)
                     System.out.print(", ");
             }
-            System.out.print("]");
+            System.out.println("]");
         }
     }
 }

@@ -12,17 +12,17 @@ import java.util.*;
 
 public class Main {
 
-    final static String BOB_SCRIPT_VERSION = "0.0.0";
+    private final static String BOB_SCRIPT_VERSION = "0.0.0";
 
     public static void main(String[] args) throws IOException {
 
         TreeNode.initDebugWriter("tree.txt");
         TreeParser parser = new TreeParser();
-
-        BufferedReader reader = new BufferedReader(new FileReader("kek.txt"));
+        String fileName = args[0];
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
         String line = "";
         PrintWriter tokenWriter = new PrintWriter("tokens.txt");
-        FileNode root = new FileNode("kek.txt");
+        FileNode root = new FileNode(fileName);
         while ((line = reader.readLine()) != null) {
             Operand tmp = new Operand(line);
             tokenWriter.println(tmp);
@@ -32,6 +32,7 @@ public class Main {
                 root.addToBody(newTreeNode);
         }
         root.debugPrint(0);
+        TreeNode.deleteDebugWriter();
         tokenWriter.close();
 
         Command[] compiled = root.compile();
@@ -51,18 +52,20 @@ public class Main {
         Log.printError(Double.toString(time));
         Log.end();
 
-        System.out.println("\nVariables: ");
+        PrintWriter executeInfo = new PrintWriter(new File("Info.txt"));
+
+        executeInfo.println("\nVariables: ");
         Set<Map.Entry<String, Variable>> kek = inter.getVariables().entrySet();
         for (Map.Entry<String, Variable> v: kek) {
-            System.out.println(v.getKey() + " " + v.getValue());
+            executeInfo.println(v.getKey() + " " + v.getValue());
         }
 
-        System.out.println("\nFunctions: ");
+        executeInfo.println("\nFunctions: ");
         Set<Map.Entry<String, FunctionAction>> bob = inter.getFunctions().entrySet();
         for (Map.Entry<String, FunctionAction> f : bob) {
-            System.out.println(f.getKey() + " " + f.getValue().isBuiltinFunction());
+            executeInfo.println(f.getKey() + " " + f.getValue().isBuiltinFunction());
         }
+        executeInfo.close();
 
-        TreeNode.deleteDebugWriter();
     }
 }

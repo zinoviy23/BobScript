@@ -1,9 +1,6 @@
 package com.BobScript.BobCode;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zinov on 20.02.2016.
@@ -83,11 +80,10 @@ public class StackData {
             case INT:
             case DOUBLE:
                 return new StackData(data, type);
-
             case STRING:
                 return new StackData(cloneString((String)data), type);
             case ARRAY:
-                return new StackData(((ArrayList<Variable>)data).clone(), type);
+                return new StackData(((ArrayList)data).clone(), type);
             default:
                 return new StackData(data, type);
         }

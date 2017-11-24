@@ -1,9 +1,6 @@
 package com.BobScript.BobCode;
 
-import com.BobScript.BobCode.Functions.BuiltInFunctions.CreateArrayFunctionAction;
-import com.BobScript.BobCode.Functions.BuiltInFunctions.ParseIntAction;
-import com.BobScript.BobCode.Functions.BuiltInFunctions.PrintAction;
-import com.BobScript.BobCode.Functions.BuiltInFunctions.ReadLineAction;
+import com.BobScript.BobCode.Functions.BuiltInFunctions.*;
 import com.BobScript.BobCode.Functions.Function;
 import com.BobScript.BobCode.Functions.FunctionAction;
 
@@ -11,7 +8,6 @@ import java.util.*;
 
 import com.BobScript.BobCode.Functions.UsersFunctionAction;
 import com.BobScript.Support.*;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 /**
  * Created by zinov on 20.02.2016.
@@ -33,6 +29,9 @@ public class Interpreter {
         info.functions.put("readLine", new ReadLineAction());
         info.functions.put("parseInt", new ParseIntAction());
         info.functions.put("createArray", new CreateArrayFunctionAction());
+        info.functions.put("println", new PrintlnAction());
+        info.functions.put("random", new RandomAction());
+        info.functions.put("createNArray", new CreateNArrayAction());
     }
 
     // иницилизирует действия команд

@@ -118,7 +118,7 @@ public class Parser {
                 if (b.getPriority() != 0) {  // if b not used
                     if (line.size() > index + 2 && line.get(index + 2).getToken().equals("(")) {
                         Operand somthing = line.extractFromParenthesis(index + 2, line.getCloseParenthesis(index + 2));
-                        Operand[] arguments = somthing.split();
+                        Operand[] arguments = somthing.split(",");
                         //System.out.println("BOB: " +somthing);
                         for (Operand kek : arguments) {
                             //compile(kek);
