@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class Operand {
     private ArrayList <Token> tokens;
-    public static String[] keywords = {"var", "if", "end", "while", "func", "return", "delete", "for", "array"};
+    public static String[] keywords = {"var", "if", "end", "while", "func", "return", "delete", "for", "array", "break"};
     private static Set<String> keywordsSet;
 
     public Operand() {

@@ -8,6 +8,7 @@ import java.util.*;
 
 import com.BobScript.BobCode.Functions.UsersFunctionAction;
 import com.BobScript.Support.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by zinov on 20.02.2016.
@@ -62,6 +63,7 @@ public class Interpreter {
         commandActions[Commands.CREATE_OR_PUSH.ordinal()] = new CreateOrPushAction();
         commandActions[Commands.GET_FROM.ordinal()] = new GetFromAction();
         commandActions[Commands.RETURN.ordinal()] = new ReturnAction();
+        commandActions[Commands.CREATE_DIMENSIONAL_ARRAY.ordinal()] = new CreateDimensionalArrayAction();
     }
 
     private Command[] currentProgram;
@@ -95,14 +97,14 @@ public class Interpreter {
     }
 
 
-    /*
-        push data_type data
+    /**
+        push data_type data <br>
 
-        push i 10
-        push f 0.5
-        push s 'abc'
-        push v a
-        push n null
+        push i 10 <br>
+        push f 0.5 <br>
+        push s 'abc' <br>
+        push v a <br>
+        push n null <br>
         push b true
      */
     // класс для добавления в стек
@@ -582,6 +584,7 @@ public class Interpreter {
         }
     }
 
+    // Выход из функции
     private class ReturnAction implements CommandAction {
         @Override
         public CommandResult Action(Command currentCommand) {
@@ -590,6 +593,44 @@ public class Interpreter {
             info.commandIndex = function.returnPosition;
             info.functionStackSize--;
             return CommandResult.OK;
+        }
+    }
+
+    // Создание многомерного массива
+    private class CreateDimensionalArrayAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            StackData st = info.stack.pop();
+            if (st.getType() != Type.ARRAY)
+                return CommandResult.ERROR;
+            else {
+                ArrayList<StackData> sizes = (ArrayList<StackData>) st.getData();
+                info.stack.push(new StackData(createArrayN(sizes.size(), 1, sizes), Type.ARRAY));
+            }
+            return CommandResult.OK;
+        }
+
+        /**
+         * Создаёт н мерный массив StackData
+         * @param n размерность
+         * @param current размерность сейчас
+         * @param sizes длинны
+         * @return массив
+         */
+        @Nullable
+        private ArrayList<StackData> createArrayN(int n, int current, ArrayList<StackData> sizes) {
+            if (sizes.get(current - 1).getType() != Type.INT)
+                return null;
+            long size = (long) sizes.get(current - 1).getData();
+            ArrayList<StackData> res = new ArrayList<>();
+            res.ensureCapacity((int) size + 1);
+            for (int i = 0; i < size; i++) {
+                if (n == current)
+                    res.add(new StackData(null, Type.NULL));
+                else
+                    res.add(new StackData(createArrayN(n, current + 1, sizes), Type.ARRAY));
+            }
+            return res;
         }
     }
 

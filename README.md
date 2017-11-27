@@ -8,7 +8,7 @@ Script Language
 
 ## Цели для версии 0.1
 - [x] for
-- [ ] array
+- [x] array
 - [ ] else, elif
 - [ ] break, continue
 - [ ] унарные операции

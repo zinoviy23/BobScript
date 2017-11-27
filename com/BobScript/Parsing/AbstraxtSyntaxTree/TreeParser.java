@@ -1,5 +1,6 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree;
 
+import com.BobScript.BobCode.Interpreter;
 import com.BobScript.Parsing.*;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes.*;
 import com.BobScript.Support.TypeSupport;
@@ -215,6 +216,16 @@ public class TreeParser {
                     line.remove(index);
                     ReturnNode returnNode = new ReturnNode(init(line));
                     return returnNode;
+                }
+
+                case "array": {
+                    Operand dimensions = line.extractFrom(index + 1, line.size() - 1);
+                    ArrayKeywordNode node = new ArrayKeywordNode(init(dimensions));
+                    line.removeAll(index + 1, line.size());
+                    line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                    //System.err.println(line);
+                    tmp.add(node);
+                    return init(line);
                 }
 
                 case "end": {
