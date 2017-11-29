@@ -64,6 +64,7 @@ public class Interpreter {
         commandActions[Commands.GET_FROM.ordinal()] = new GetFromAction();
         commandActions[Commands.RETURN.ordinal()] = new ReturnAction();
         commandActions[Commands.CREATE_DIMENSIONAL_ARRAY.ordinal()] = new CreateDimensionalArrayAction();
+        commandActions[Commands.PARSE_BREAK.ordinal()] = new ParseErrorAction();
     }
 
     private Command[] currentProgram;
@@ -631,6 +632,15 @@ public class Interpreter {
                     res.add(new StackData(createArrayN(n, current + 1, sizes), Type.ARRAY));
             }
             return res;
+        }
+    }
+
+    // Обработка ошибки при парсинге
+    private class ParseErrorAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            Log.printError(currentCommand + "Error!");
+            return CommandResult.ERROR;
         }
     }
 

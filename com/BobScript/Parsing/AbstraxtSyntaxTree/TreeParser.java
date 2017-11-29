@@ -191,6 +191,14 @@ public class TreeParser {
                     return null;
                 }
 
+                case "break": {
+                    return new BreakNode();
+                }
+
+                case "continue": {
+                    return new ContinueNode();
+                }
+
                 case "if": {
                     line.remove(index);
                     IfNode ifNode = new IfNode(init(line), null);

@@ -15,8 +15,8 @@ public class Command {
         args = params;
     }
 
-    Commands getCommand() { return cmd; }
-    Object[] getArgs() { return args; }
+    public Commands getCommand() { return cmd; }
+    public Object[] getArgs() { return args; }
 
     @Deprecated
     public static String stringTokenizerToString(StringTokenizer st) {

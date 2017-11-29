@@ -6,7 +6,7 @@ package com.BobScript.BobCode;
 public enum Commands {
     EXIT, PUSH, ASSIGN, DELETE, ADD, SUB, LESSER, GREATER, EQUAL, CONDITION, END_CONDITION, GOTO, MULT,
     FUNCTION, ARG_COUNT, ARGUMENT, CALL, END_FUNCTION, ASSIGN_ADD, CREATE_ARRAY, CREATE_DIMENSIONAL_ARRAY,
-    CREATE_OR_PUSH, GET_FROM, RETURN;
+    CREATE_OR_PUSH, GET_FROM, RETURN, PARSE_BREAK, PARSE_CONTINUE;
 
     @Override
     public String toString() {
@@ -59,6 +59,10 @@ public enum Commands {
                 return "return";
             case CREATE_DIMENSIONAL_ARRAY:
                 return "create_dimensional_array";
+            case PARSE_BREAK:
+                return "parse_break";
+            case PARSE_CONTINUE:
+                return "paese_continue";
         }
 
         return "";

@@ -13,7 +13,7 @@ public class Operand {
      * Ключевые слова
      */
     public static String[] keywords = {"var", "if", "end", "while", "func",
-            "return", "delete", "for", "array", "break",
+            "return", "delete", "for", "array", "break", "continue",
     "else", "elif"};
 
     private static Set<String> keywordsSet;

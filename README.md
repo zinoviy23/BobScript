@@ -12,6 +12,6 @@ Script Language
 - [x] for
 - [x] array
 - [x] else, elif
-- [ ] break, continue
+- [x] break, continue
 - [ ] унарные операции
 

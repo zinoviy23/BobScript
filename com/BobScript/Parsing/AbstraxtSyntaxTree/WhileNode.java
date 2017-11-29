@@ -44,11 +44,23 @@ public class WhileNode extends ComplexNode {
         res.addAll(Arrays.asList(conditionCommands));
         res.add(new Command(Commands.CONDITION, ""));
 
-        for (TreeNode tn : body)
+        for (TreeNode tn : body) {
             res.addAll(Arrays.asList(tn.compile()));
+        }
+
+        for (int i = 0; i < res.size(); i++)
+            if (res.get(i).getCommand() == Commands.PARSE_CONTINUE) {
+                res.set(i, new Command(Commands.GOTO, res.size() - i));
+            }
 
         res.add(new Command(Commands.GOTO, -res.size()));
+
         res.add(new Command(Commands.END_CONDITION, ""));
+
+        for (int i = 0; i < res.size(); i++)
+            if (res.get(i).getCommand() == Commands.PARSE_BREAK) {
+                res.set(i, new Command(Commands.GOTO, res.size() - i));
+            }
 
         return arrayListToArray(res);
     }
