@@ -193,8 +193,26 @@ public class TreeParser {
 
                 case "if": {
                     line.remove(index);
-                    IfNode ifNode = new IfNode(init(line));
+                    IfNode ifNode = new IfNode(init(line), null);
                     currentParent.push(ifNode);
+                    return null;
+                }
+
+                case "elif": {
+                    IfNode parent = (IfNode)currentParent.pop();
+                    line.remove(index);
+                    IfNode ifNode = new IfNode(init(line), parent);
+                    parent.setElseNode(ifNode);
+                    currentParent.push(ifNode);
+                    return null;
+                }
+
+                case "else": {
+                    IfNode parent = (IfNode)currentParent.pop();
+                    line.remove(index);
+                    ElseNode elseNode = new ElseNode(parent);
+                    parent.setElseNode(elseNode);
+                    currentParent.push(elseNode);
                     return null;
                 }
 
@@ -223,12 +241,14 @@ public class TreeParser {
                     ArrayKeywordNode node = new ArrayKeywordNode(init(dimensions));
                     line.removeAll(index + 1, line.size());
                     line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
-                    //System.err.println(line);
                     tmp.add(node);
                     return init(line);
                 }
 
                 case "end": {
+                    if (currentParent.peek() instanceof Parentable) {
+                        return ((Parentable)currentParent.pop()).findRoot();
+                    }
                     return currentParent.peek();
                 }
             }

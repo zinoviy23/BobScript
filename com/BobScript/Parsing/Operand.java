@@ -9,7 +9,13 @@ import java.util.*;
  */
 public class Operand {
     private ArrayList <Token> tokens;
-    public static String[] keywords = {"var", "if", "end", "while", "func", "return", "delete", "for", "array", "break"};
+    /**
+     * Ключевые слова
+     */
+    public static String[] keywords = {"var", "if", "end", "while", "func",
+            "return", "delete", "for", "array", "break",
+    "else", "elif"};
+
     private static Set<String> keywordsSet;
 
     public Operand() {
@@ -21,7 +27,10 @@ public class Operand {
         return tokens;
     }
 
-    // make array of tokens from string
+    /** make array of tokens from string
+     *
+     * @param operand
+     */
     public Operand(String operand) {
         initKeywords();
         tokens = new ArrayList<>();
@@ -199,7 +208,7 @@ public class Operand {
         return index;
     }
 
-    /* return index of Close Parenthesis for Open Parenthesis,
+    /** return index of Close Parenthesis for Open Parenthesis,
      if argument index not Open Parenthesis return -1,
      if no Close Parenthesis return -2
       */

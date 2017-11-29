@@ -6,13 +6,32 @@ import com.BobScript.BobCode.Commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class IfNode extends ComplexNode {
+public class IfNode extends ComplexNode implements Parentable {
     private ArrayList<TreeNode> body;
     private TreeNode condition;
+    private TreeNode elseNode;
+    private IfNode parent;
 
-    public IfNode(TreeNode condition) {
+    public IfNode(TreeNode condition, IfNode parent) {
         this.condition = condition;
         body = new ArrayList<>();
+        elseNode = null;
+        this.parent = parent;
+    }
+
+    /**
+     * Определяет следующий else
+     * @param tn
+     */
+    public void setElseNode(TreeNode tn) {
+        elseNode = tn;
+    }
+
+    @Override
+    public TreeNode findRoot() {
+        if (parent != null)
+            return parent.findRoot();
+        return this;
     }
 
     @Override
@@ -32,6 +51,13 @@ public class IfNode extends ComplexNode {
         debugWriter.println("Body: ");
         for (TreeNode tn : body)
             tn.debugPrint(level + 1);
+
+        if (elseNode != null) {
+            drawLevel(level);
+            debugWriter.println("Else:");
+            elseNode.debugPrint(level + 1);
+        }
+
     }
 
     @Override
@@ -46,7 +72,13 @@ public class IfNode extends ComplexNode {
         for (TreeNode tn : body)
             res.addAll(Arrays.asList(tn.compile()));
 
+        Command[] elseCmd = new Command[0];
+        if (elseNode != null)
+            elseCmd = elseNode.compile();
+        res.add(new Command(Commands.GOTO, elseCmd.length + 2));
+
         res.add(new Command(Commands.END_CONDITION, ""));
+        res.addAll(Arrays.asList(elseCmd));
 
         return arrayListToArray(res);
     }
