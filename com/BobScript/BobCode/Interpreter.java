@@ -67,6 +67,7 @@ public class Interpreter {
         commandActions[Commands.PARSE_BREAK.ordinal()] = new ParseErrorAction();
         commandActions[Commands.PARSE_CONTINUE.ordinal()] = new ParseErrorAction();
         commandActions[Commands.UNARY_MINUS.ordinal()] = new UnaryMinusAction();
+        commandActions[Commands.INCREMENT.ordinal()] = new IncrementAction();
     }
 
     private Command[] currentProgram;
@@ -646,6 +647,7 @@ public class Interpreter {
         }
     }
 
+    // Унарный минус
     private class UnaryMinusAction implements CommandAction {
         @Override
         public CommandResult Action(Command currentCommand) {
@@ -667,6 +669,30 @@ public class Interpreter {
             return CommandResult.OK;
         }
     }
+
+    // инкремент
+    private class IncrementAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.empty()) {
+                Log.printError(currentCommand + "Error! stack size too small");
+                return CommandResult.ERROR;
+            }
+            StackData sd = info.stack.peek();
+            if (sd.getType() == Type.INT) {
+                sd.data = (long)sd.data + 1;
+            }
+            else if (sd.getType() == Type.DOUBLE) {
+                sd.data = (double)sd.data + 1.0;
+            }
+            else {
+                Log.printError(currentCommand + "There isn't ++ operator for " + sd);
+                return CommandResult.ERROR;
+            }
+            return CommandResult.OK;
+        }
+    }
+
 
     public Stack<StackData> getStack() {
         return info.stack;

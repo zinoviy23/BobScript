@@ -4,6 +4,7 @@ import com.BobScript.BobCode.Command;
 import com.BobScript.BobCode.Commands;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes.DoubleNode;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes.IntNode;
+import com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes.VariableNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +49,14 @@ public class UnaryNode extends TreeNode {
                     return arrayListToArray(commands);
                 }
             }
+            // где-то нужна проверка на переменная это или нет
             case "++": {
-                return null;
+                ArrayList<Command> commands = new ArrayList<>();
+                commands.addAll(Arrays.asList(value.compile()));
+                commands.add(new Command(Commands.INCREMENT));
+                return arrayListToArray(commands);
             }
         }
-        return null;
+        return new Command[0];
     }
 }

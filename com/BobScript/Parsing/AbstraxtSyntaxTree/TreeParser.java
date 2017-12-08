@@ -65,13 +65,16 @@ public class TreeParser {
                 case "+=":
                 case ",":
                 case ".":
+                case "++":
                 case ":": {
                     Token left = line.get(index - 1);
                     Token right = line.get(index + 1);
 
                     TreeNode nodeLeft = null, nodeRight = null;
                     boolean isUnaryLeft = false;
-                    if (!left.isForParsing()) {
+                    if (left == null)
+                        isUnaryLeft = true;
+                    else if (!left.isForParsing()) {
                         if (TypeSupport.tryInt(left.getToken()))
                             nodeLeft = new IntNode(Long.parseLong(left.getToken()));
                         else if (TypeSupport.tryDouble(left.getToken()))
@@ -266,6 +269,8 @@ public class TreeParser {
                 }
 
                 case "end": {
+                    //if (currentParent.empty())
+                      //  return null;
                     if (currentParent.peek() instanceof Parentable) {
                         return ((Parentable)currentParent.pop()).findRoot();
                     }

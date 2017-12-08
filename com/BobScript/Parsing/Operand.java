@@ -136,6 +136,8 @@ public class Operand {
     }
 
     public Token get(int i) {
+        if (i < 0)
+            return null;
         return tokens.get(i);
     }
 
@@ -282,7 +284,7 @@ public class Operand {
     public static boolean isDelimiter(String s) {
         if (s.length() == 1)
             return isDelimiter(s.charAt(0));
-        return s.equals("<=") || s.equals(">=") || s.equals("==") || s.equals("+=");
+        return s.equals("<=") || s.equals(">=") || s.equals("==") || s.equals("+=") || s.equals("++");
     }
 
     public static boolean isKeyword(String s) {
@@ -322,8 +324,6 @@ public class Operand {
             if (s.equals(",") || s.equals(";"))
                 return 2;
 
-            if (isKeyword(s))
-                return 1000;
         }
         else {
             if (s.equals("-"))
@@ -332,6 +332,8 @@ public class Operand {
             if (s.equals("++"))
                 return 20;
         }
+        if (isKeyword(s))
+            return 1000;
         return 1;
     }
 

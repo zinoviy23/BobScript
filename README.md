@@ -13,5 +13,5 @@ Script Language
 - [x] array
 - [x] else, elif
 - [x] break, continue
-- [ ] унарные операции
+- [x] унарные операции
 
