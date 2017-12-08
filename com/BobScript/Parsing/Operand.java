@@ -301,29 +301,37 @@ public class Operand {
     public static boolean isDigit(char c) { return c >= '0' && c <= '9'; }
 
     public static int getOperatorPriority(String s, boolean unary) {
-        if (s.equals("+") || s.equals("-"))
-            return 14;
+        if (!unary) {
+            if (s.equals("+") || s.equals("-"))
+                return 14;
 
-        if (s.equals("*"))
-            return 15;
+            if (s.equals("*"))
+                return 15;
 
-        if (s.equals("."))
-            return 30;
-        if (s.equals(":"))
-            return 31;
+            if (s.equals("."))
+                return 30;
+            if (s.equals(":"))
+                return 31;
 
-        if (s.equals("<") || s.equals(">") || s.equals("=="))
-            return 4;
+            if (s.equals("<") || s.equals(">") || s.equals("=="))
+                return 4;
 
-        if (s.equals("=") || s.equals("+="))
-            return 3;
+            if (s.equals("=") || s.equals("+="))
+                return 3;
 
-        if (s.equals(",") || s.equals(";"))
-            return 2;
+            if (s.equals(",") || s.equals(";"))
+                return 2;
 
-        if (isKeyword(s))
-            return 1000;
+            if (isKeyword(s))
+                return 1000;
+        }
+        else {
+            if (s.equals("-"))
+                return 20;
 
+            if (s.equals("++"))
+                return 20;
+        }
         return 1;
     }
 

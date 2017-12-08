@@ -69,9 +69,8 @@ public class TreeParser {
                     Token left = line.get(index - 1);
                     Token right = line.get(index + 1);
 
-                    OperationNode operation = new OperationNode(tk.getToken());
-                    TreeNode nodeLeft, nodeRight;
-
+                    TreeNode nodeLeft = null, nodeRight = null;
+                    boolean isUnaryLeft = false;
                     if (!left.isForParsing()) {
                         if (TypeSupport.tryInt(left.getToken()))
                             nodeLeft = new IntNode(Long.parseLong(left.getToken()));
@@ -84,10 +83,11 @@ public class TreeParser {
                         else if (TypeSupport.tryBoolean(left.getToken()))
                             nodeLeft = new BooleanNode(left.getToken().equals("true"));
                         else {
-                            //System.out.println(left.getToken());
-                            if (left.isDelimiter())
-                                System.out.println("это левый унарный оператор, они пока не поддреживаются");
-                            nodeLeft = new VariableNode(left.getToken());
+                            if (left.isDelimiter()) {
+                                isUnaryLeft = true;
+                            }
+                            else
+                                nodeLeft = new VariableNode(left.getToken());
                         }
                     }
                     else {
@@ -111,14 +111,26 @@ public class TreeParser {
                     else {
                         nodeRight = tmp.get(Integer.parseInt(right.getToken()));
                     }
+                    TreeNode operation;
+                    if (isUnaryLeft) {
+                        operation = new UnaryNode(nodeRight, tk.getToken());;
+                    }
+                    else {
+                        OperationNode op = new OperationNode(tk.getToken());
+                        op.setRight(nodeRight);
+                        op.setLeft(nodeLeft);
+                        operation = op;
+                    }
 
-                    operation.setLeft(nodeLeft);
-                    operation.setRight(nodeRight);
 
                     line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
-                    line.remove(index - 1);
-                    line.remove(index);
-
+                    if (!isUnaryLeft) {
+                        line.remove(index - 1);
+                        line.remove(index);
+                    }
+                    else {
+                        line.remove(index + 1);
+                    }
                     tmp.add(operation);
                     return init(line);
                 }

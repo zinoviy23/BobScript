@@ -65,6 +65,8 @@ public class Interpreter {
         commandActions[Commands.RETURN.ordinal()] = new ReturnAction();
         commandActions[Commands.CREATE_DIMENSIONAL_ARRAY.ordinal()] = new CreateDimensionalArrayAction();
         commandActions[Commands.PARSE_BREAK.ordinal()] = new ParseErrorAction();
+        commandActions[Commands.PARSE_CONTINUE.ordinal()] = new ParseErrorAction();
+        commandActions[Commands.UNARY_MINUS.ordinal()] = new UnaryMinusAction();
     }
 
     private Command[] currentProgram;
@@ -641,6 +643,28 @@ public class Interpreter {
         public CommandResult Action(Command currentCommand) {
             Log.printError(currentCommand + "Error!");
             return CommandResult.ERROR;
+        }
+    }
+
+    private class UnaryMinusAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.empty()) {
+                Log.printError(currentCommand + "Error! stack size too small");
+                return CommandResult.ERROR;
+            }
+            StackData sd = info.stack.pop();
+            if (sd.getType() == Type.INT) {
+                info.stack.push(new StackData(-(long)sd.getData(), Type.INT));
+            }
+            else if (sd.getType() == Type.DOUBLE) {
+                info.stack.push(new StackData(-(double)sd.getData(), Type.DOUBLE));
+            }
+            else {
+                Log.printError(currentCommand + "There isn't - operator for " + sd);
+                return CommandResult.ERROR;
+            }
+            return CommandResult.OK;
         }
     }
 
