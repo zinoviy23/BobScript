@@ -41,7 +41,6 @@ public class TreeParser {
     }
 
     private TreeNode init(Operand line) {
-        //System.out.println(line);
         int index = line.next();
 
         if (line.size() == 0)
@@ -143,12 +142,10 @@ public class TreeParser {
                     Operand arguments = line.extractFromParenthesis(index, closeIndex);
                     FunctionCallNode fcn = new FunctionCallNode(nameToken.getToken());
                     TreeNode kek = init(arguments);
-                    //kek.debugPrint(0);
                     fcn.setComaNode(kek);
                     line.removeAll(index - 1, closeIndex);
                     line.set(index - 1, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
                     tmp.add(fcn);
-                    //fcn.debugPrint(0);
                     return init(line);
                 }
                 case "[": {

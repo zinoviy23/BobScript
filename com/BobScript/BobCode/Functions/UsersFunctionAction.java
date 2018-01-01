@@ -1,5 +1,6 @@
 package com.BobScript.BobCode.Functions;
 
+import com.BobScript.BobCode.Interpreter;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Variable;
@@ -13,6 +14,8 @@ public class UsersFunctionAction extends FunctionAction {
     private int startPosition;
     private ArrayList<String> argumentsInfo;
     private ArrayList<String> functionsVariables;
+    private int startStackSize;
+
 
     @Override
     public int getArgumentsCount() {
@@ -30,6 +33,7 @@ public class UsersFunctionAction extends FunctionAction {
         info.commandIndex = startPosition - 1;
         functionsVariables = new ArrayList<>();
         initArguments(info);
+        startStackSize = info.stack.size();
     }
 
     /**
@@ -43,6 +47,23 @@ public class UsersFunctionAction extends FunctionAction {
             argument.assignCopy(argumentValue);
 
             info.variables.put(info.functionStackSize + "#" + arg, argument);
+        }
+    }
+
+    /**
+     * Очищает стек до состояния, в котором он был до вызова
+     * @param info
+     * @param isReturnSomething
+     */
+    public void clearStackExit(InterpreterInfo info, boolean isReturnSomething) {
+        if (!isReturnSomething)
+            while (startStackSize < info.stack.size())
+                info.stack.pop();
+        else {
+            StackData top = info.stack.pop();
+            while (startStackSize < info.stack.size())
+                info.stack.pop();
+            info.stack.push(top);
         }
     }
 

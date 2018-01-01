@@ -12,7 +12,7 @@ import java.util.*;
 
 public class Main {
 
-    private final static String BOB_SCRIPT_VERSION = "0.0.0";
+    private final static String BOB_SCRIPT_VERSION = "0.1.0";
 
     public static void main(String[] args) throws IOException {
 
@@ -38,10 +38,33 @@ public class Main {
 
             Command[] compiled = root.compile();
 
+            FileOutputStream serCommands = new FileOutputStream(fileName + ".bbc");
+            ObjectOutputStream oos = new ObjectOutputStream(serCommands);
+            oos.writeObject(new CommandArray(compiled));
+            oos.flush();
+            oos.close();
+
+            FileInputStream fin = new FileInputStream(fileName + ".bbc");
+            ObjectInputStream ois = new ObjectInputStream(fin);
             PrintWriter tmpWriter = new PrintWriter(new File("bobcode.bbc"));
-            for (Command c : compiled) {
-                tmpWriter.println(c);
+            try {
+                CommandArray commandArray = (CommandArray) ois.readObject();
+                int i = 0;
+                for (Command c : commandArray.getCommands()) {
+                    tmpWriter.println(i + " : " + c);
+                    i++;
+                }
+
+            } catch (Exception ex) {
+                System.out.println("bliin");
+                for (Command c : compiled) {
+                    tmpWriter.println(c);
+                }
             }
+
+            //for (Command c : compiled) {
+              //  tmpWriter.println(c);
+            //}
             tmpWriter.close();
 
             Interpreter inter = new Interpreter();
@@ -66,35 +89,17 @@ public class Main {
             for (Map.Entry<String, FunctionAction> f : bob) {
                 executeInfo.println(f.getKey() + " " + f.getValue().isBuiltinFunction());
             }
+
+            executeInfo.println("\nStack");
+            Stack<StackData> stackData = inter.getStack();
+            for (StackData sd : stackData) {
+                executeInfo.println(sd);
+            }
+
             executeInfo.close();
         }
         else {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            Interpreter inter = new Interpreter();
-            TreeParser parser = new TreeParser();
-            boolean exit = false;
-            boolean prev = false;
-            System.out.println("BobScript Test" + BOB_SCRIPT_VERSION);
-            do {
-                if (!prev)
-                    System.out.print("\n>> ");
-                String line = reader.readLine();
-                if (line.equals("exit"))
-                    exit = true;
-                else {
-                    Operand op = new Operand(line);
-                    TreeNode currentNode = parser.createNode(op);
-                    if (currentNode == null) {
-                        prev = true;
-                        continue;
-                    }
-                    if (prev)
-                        prev = false;
-                    inter.execute(currentNode.compile());
-                    if (!inter.getStack().empty())
-                        System.out.println(inter.getStack().pop());
-                }
-            } while (!exit);
+            System.out.println("Enter file name");
         }
     }
 }

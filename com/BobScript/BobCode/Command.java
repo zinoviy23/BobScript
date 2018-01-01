@@ -4,9 +4,10 @@ package com.BobScript.BobCode;
  * Created by zinov on 20.02.2016.
  */
 
+import java.io.Serializable;
 import java.util.StringTokenizer;
 
-public class Command {
+public class Command implements Serializable {
     private Commands cmd;
     private Object[] args;
 

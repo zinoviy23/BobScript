@@ -45,7 +45,7 @@ public class Operand {
             }
             else if (isLatter(operand.charAt(i))) {
                 int ind = i + 1;
-                while (ind < operand.length() && isLatter(operand.charAt(ind))) {
+                while (ind < operand.length() && (isLatter(operand.charAt(ind)) || isDigit(operand.charAt(ind)))) {
                     ind++;
                 }
                 String currentOperand = operand.substring(i, ind);
@@ -60,7 +60,7 @@ public class Operand {
                 }
                 else {
                     isFunctionParenthesis.push(true);
-                    addToken("(", Token.TokenTypes.DELIMITER, pr + 20);
+                    addToken("(", Token.TokenTypes.DELIMITER, pr + 33);
                 }
             }
             else if (operand.charAt(i) == ')') {
@@ -249,7 +249,10 @@ public class Operand {
     }
 
     public boolean isLastDelimiter() {
-        return tokens.size() < 1 || tokens.get(tokens.size() - 1).isDelimiter() || tokens.get(tokens.size() - 1).isKeyword();
+        return tokens.size() < 1 || (tokens.get(tokens.size() - 1).isDelimiter()
+                || tokens.get(tokens.size() - 1).isKeyword()) &&
+                !tokens.get(tokens.size() - 1).getToken().equals("]") &&
+                !tokens.get(tokens.size() - 1).getToken().equals(")");
     }
 
     @Override
@@ -345,8 +348,6 @@ public class Operand {
 
     private static void initKeywords() {
         keywordsSet = new HashSet<>();
-        for (int i = 0; i < keywords.length; i++) {
-            keywordsSet.add(keywords[i]);
-        }
+        keywordsSet.addAll(Arrays.asList(keywords));
     }
 }

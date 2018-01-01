@@ -24,9 +24,12 @@ public class ReturnNode extends TreeNode {
     @Override
     public Command[] compile() {
         ArrayList<Command> commands = new ArrayList<>();
-        if (returnValue != null)
+        if (returnValue != null) {
             commands.addAll(Arrays.asList(returnValue.compile()));
-        commands.add(new Command(Commands.RETURN));
+            commands.add(new Command(Commands.RETURN, true));
+        }
+        else
+            commands.add(new Command(Commands.RETURN, false));
         return arrayListToArray(commands);
     }
 }

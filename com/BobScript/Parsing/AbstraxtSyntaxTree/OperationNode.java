@@ -58,7 +58,8 @@ public class OperationNode extends TreeNode {
         ArrayList<Command> res = new ArrayList<>();
         if (!operation.equals("=") || (left instanceof ArrayElementNode))
             res.addAll(Arrays.asList(left.compile()));
-        res.addAll(Arrays.asList(right.compile()));
+        if (!operation.equals("."))
+            res.addAll(Arrays.asList(right.compile()));
         switch (operation) {
             case "+":
                 res.add(new Command(Commands.ADD, ""));
@@ -87,6 +88,14 @@ public class OperationNode extends TreeNode {
             case "+=":
                 res.add(new Command(Commands.ASSIGN_ADD, ""));
                 break;
+            case ".":
+                if (right instanceof VariableNode)
+                    res.add(new Command(Commands.GET_FIELD_FROM, ((VariableNode)right).getName()));
+                else if (right instanceof FunctionCallNode) {
+                    FunctionCallNode tmp = (FunctionCallNode)right;
+                    tmp.setPointCall(true);
+                    res.addAll(Arrays.asList(tmp.compile()));
+                }
         }
         return arrayListToArray(res);
     }

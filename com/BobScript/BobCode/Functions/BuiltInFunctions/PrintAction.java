@@ -17,16 +17,24 @@ public class PrintAction extends FunctionAction {
     @Override
     public void Action(InterpreterInfo info) {
         StackData tmp = info.stack.pop();
-        if (tmp.getType() != Type.ARRAY)
-            //System.out.println("> " + tmp.getData());
-            System.out.print(tmp.getData());
-        else {
+        print(tmp);
+    }
+
+    /**
+     * Выводит, с учетом массивов и тд
+     * @param data
+     */
+    private void print(StackData data) {
+        if (data.getType() != Type.ARRAY) {
+            System.out.print(data.getData());
+        } else {
+            ArrayList<StackData> arrayOfData = (ArrayList<StackData>)data.getData();
             System.out.print("[");
-            ArrayList<StackData> array = (ArrayList<StackData>)tmp.getData();
-            for (int i = 0; i < array.size(); i++) {
-                System.out.print(array.get(i).getData());
-                if (i != array.size() - 1)
+            for (int i = 0; i < arrayOfData.size(); i++) {
+                print(arrayOfData.get(i));
+                if (i != arrayOfData.size() - 1) {
                     System.out.print(", ");
+                }
             }
             System.out.print("]");
         }

@@ -68,6 +68,8 @@ public class Interpreter {
         commandActions[Commands.PARSE_CONTINUE.ordinal()] = new ParseErrorAction();
         commandActions[Commands.UNARY_MINUS.ordinal()] = new UnaryMinusAction();
         commandActions[Commands.INCREMENT.ordinal()] = new IncrementAction();
+        commandActions[Commands.GET_FIELD_FROM.ordinal()] = new GetFieldFromAction();
+        commandActions[Commands.CALL_FROM.ordinal()] = new CallFromAction();
     }
 
     private Command[] currentProgram;
@@ -86,7 +88,7 @@ public class Interpreter {
                 case OK:
                     break;
                 case ERROR:
-                    Log.printError("Error! " + currentCommand);
+                    Log.printError("Error! " + info.commandIndex + " : " + currentCommand);
                     return -1;
                 case CONTINUE_OK:
                     continue;
@@ -117,6 +119,7 @@ public class Interpreter {
         public CommandResult Action(Command currentCommand) {
             char pushParam = (char)currentCommand.getArgs()[0];
             Object pushData = currentCommand.getArgs()[1];
+            //System.err.println(currentCommand);
             switch (pushParam) {
                 // integer
                 case 'i':
@@ -186,7 +189,10 @@ public class Interpreter {
             }
             StackData result = info.stack.pop();
             StackData variablePointer = info.stack.pop();
+            //System.err.print(variablePointer + " ---- ");
+            //System.err.print((info.variables.get("c") == variablePointer) + " .... ");
             variablePointer.assignCopy(result);
+            //System.err.println(variablePointer);
 
             return CommandResult.OK;
         }
@@ -510,6 +516,7 @@ public class Interpreter {
     private class CreateOrPushAction implements CommandAction {
         @Override
         public CommandResult Action(Command currentCommand) {
+            //System.err.println(currentCommand);
             String name = (String)currentCommand.getArgs()[0];
             if (info.functionStackSize == 0) {
                 if (!info.variables.containsKey(name)) {
@@ -581,6 +588,7 @@ public class Interpreter {
         @Override
         public CommandResult Action(Command currentCommand) {
             Function function = info.functionStack.pop();
+            ((UsersFunctionAction)function.action).clearStackExit(info, false);
             ((UsersFunctionAction)function.action).endFunction(info);
             info.commandIndex = function.returnPosition;
             info.functionStackSize--;
@@ -593,6 +601,8 @@ public class Interpreter {
         @Override
         public CommandResult Action(Command currentCommand) {
             Function function = info.functionStack.pop();
+            boolean isReturnSomething = (boolean)currentCommand.getArgs()[0];
+            ((UsersFunctionAction)function.action).clearStackExit(info, isReturnSomething);
             ((UsersFunctionAction)function.action).endFunction(info);
             info.commandIndex = function.returnPosition;
             info.functionStackSize--;
@@ -692,6 +702,74 @@ public class Interpreter {
             return CommandResult.OK;
         }
     }
+
+    // получение поля пока криво
+    private class GetFieldFromAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.empty()) {
+                Log.printError("ERROR! Stack size too small " + currentCommand);
+                return CommandResult.ERROR;
+            }
+            StackData obj = info.stack.pop();
+            String field = (String)currentCommand.getArgs()[0];
+            switch (field) {
+                case "length":
+                    if (obj.getType() != Type.ARRAY) {
+                        Log.printError("Nothing length");
+                        return CommandResult.ERROR;
+                    }
+                    info.stack.push(new StackData((long)((ArrayList<StackData>)obj.getData()).size(), Type.INT));
+                    break;
+                case "str":
+                    if (obj.getType() != Type.NULL)
+                        info.stack.push(new StackData(obj.getData().toString(), Type.STRING));
+                    else {
+                        Log.printError("NullPointerException");
+                        return CommandResult.ERROR;
+                    }
+            }
+            return CommandResult.OK;
+        }
+    }
+
+    // вызов метода у объекта пока криво
+    private class CallFromAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.empty()) {
+                Log.printError("Error! stack too small " + currentCommand);
+                return CommandResult.ERROR;
+            }
+            int argCount = (int)currentCommand.getArgs()[1];
+            StackData arguments[] = new StackData[argCount];
+
+            for (int i = 0; i < argCount; i++) {
+                if (!info.stack.empty()) {
+                    arguments[i] = info.stack.pop();
+                }
+                else {
+                    Log.printError("Error! stack too small " + currentCommand);
+                    return CommandResult.ERROR;
+                }
+            }
+
+            StackData callObject = info.stack.pop();
+            String name = (String)currentCommand.getArgs()[0];
+
+            if (callObject.getType() == Type.ARRAY && name.equals("add") && argCount == 1) {
+                ArrayList<StackData> array = (ArrayList<StackData>)callObject.getData();
+                array.add(arguments[0]);
+            }
+            else {
+                Log.printError("Error! nothing methods " + currentCommand);
+                return CommandResult.ERROR;
+            }
+
+            return CommandResult.OK;
+        }
+    }
+
 
 
     public Stack<StackData> getStack() {

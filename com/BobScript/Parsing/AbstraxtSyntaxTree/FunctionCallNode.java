@@ -10,6 +10,7 @@ public class FunctionCallNode extends TreeNode {
     private ArrayList<TreeNode> arguments;
     private String name;
     private TreeNode comaNode;
+    private boolean isPointCall;
 
     public FunctionCallNode(String name) {
         this.name = name;
@@ -21,7 +22,13 @@ public class FunctionCallNode extends TreeNode {
         initArguments(comaNode);
     }
 
+    public boolean isPointCall() {
+        return isPointCall;
+    }
 
+    public void setPointCall(boolean pointCall) {
+        isPointCall = pointCall;
+    }
 
     @Override
     public void debugPrint(int level) {
@@ -54,7 +61,11 @@ public class FunctionCallNode extends TreeNode {
         ArrayList<Command> cmd = new ArrayList<>();
         for (int i = arguments.size() - 1; i >= 0; i--)
             cmd.addAll(Arrays.asList(arguments.get(i).compile()));
-        cmd.add(new Command(Commands.CALL, name, arguments.size()));
+        if (!isPointCall())
+            cmd.add(new Command(Commands.CALL, name, arguments.size()));
+        else
+            cmd.add(new Command(Commands.CALL_FROM, name, arguments.size()));
+
         return arrayListToArray(cmd);
     }
 }
