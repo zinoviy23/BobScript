@@ -14,6 +14,7 @@ public class InterpreterInfo {
     public HashMap<String, FunctionAction> functions;
     public Stack<Function> functionStack;
     public int functionStackSize;
+    public Interpreter interpreter;
 
     public InterpreterInfo() {
         commandIndex = 0;

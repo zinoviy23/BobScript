@@ -21,6 +21,7 @@ public class Interpreter {
 
     public Interpreter() {
         info = new InterpreterInfo();
+        info.interpreter = this;
         initCommandActions();
         initBuiltInFunctions();
     }
@@ -98,6 +99,40 @@ public class Interpreter {
         return 0;
     }
 
+    public void callFunction(FunctionAction func) {
+        //System.out.println("lollll");
+        if (func.isBuiltinFunction()) {
+            func.Action(info);
+            return;
+        }
+        else {
+            int prevSize = info.functionStackSize;
+            int prevCommandIndex = info.commandIndex;
+            info.functionStack.push(new Function(info.commandIndex, func));
+            info.functionStackSize++;
+            func.Action(info);
+            Command currentCommand;
+            info.commandIndex++;
+            while (info.functionStackSize != prevSize) {
+                currentCommand = currentProgram[info.commandIndex];
+                //System.out.println(info.commandIndex + ": " + currentCommand);
+                CommandAction currentAction = commandActions[currentCommand.getCommand().ordinal()];
+                switch (currentAction.Action(currentCommand)) {
+                    case OK:
+                        break;
+                    case ERROR:
+                        Log.printError("Error! " + info.commandIndex + " : " + currentCommand);
+                        return;
+                    case CONTINUE_OK:
+                        continue;
+                }
+                info.commandIndex++;
+            }
+            info.commandIndex = prevCommandIndex;
+        }
+    }
+
+
     public static boolean isDigit(char c) {
         return '0' <= c && c <= '9';
     }
@@ -127,11 +162,12 @@ public class Interpreter {
                     break;
                 // float
                 case 'f':
-                    info.stack.add(new StackData(pushData, Type.DOUBLE));
+                    info.stack.add(new StackData(pushData, Type.FLOAT));
                     break;
                 // string
                 case 's':
-                    info.stack.add(new StackData(TypeSupport.toConstString((String)pushData), Type.STRING));
+                    //info.stack.add(new StackData(TypeSupport.toConstString((String)pushData), Type.STRING));
+                    info.stack.add(ObjectsFactory.createString(TypeSupport.toConstString((String)pushData)));
                     break;
                 // null
                 case 'n':
@@ -147,7 +183,10 @@ public class Interpreter {
                         info.stack.add(info.variables.get(info.functionStackSize + "#" + pushData));
                     } else if (info.variables.containsKey(pushData)) {
                         info.stack.add(info.variables.get(pushData));
-                    } else {
+                    } else if(info.functions.containsKey(pushData)) {
+                        info.stack.push(ObjectsFactory.createFunction(info.functions.get(pushData)));
+                    }
+                    else {
                         System.out.println("lol");
                         Log.printError("Error: " + currentCommand + " nothing variables");
                         return CommandResult.ERROR;
@@ -162,7 +201,7 @@ public class Interpreter {
             /*if (TypeSupport.tryInt(args[0])) {
                 stack.add(new StackData(Long.parseLong(args[0]), Type.INT));
             } else if (TypeSupport.tryDouble(args[0])) {
-                stack.add(new StackData(Double.parseDouble(args[0]), Type.DOUBLE));
+                stack.add(new StackData(Double.parseDouble(args[0]), Type.FLOAT));
             } else if (TypeSupport.tryConstString(args[0])) {
                 stack.add(new StackData(TypeSupport.toConstString(args[0]), Type.STRING));
             } else if (TypeSupport.tryBoolean(args[0])) {
@@ -189,10 +228,7 @@ public class Interpreter {
             }
             StackData result = info.stack.pop();
             StackData variablePointer = info.stack.pop();
-            //System.err.print(variablePointer + " ---- ");
-            //System.err.print((info.variables.get("c") == variablePointer) + " .... ");
             variablePointer.assignCopy(result);
-            //System.err.println(variablePointer);
 
             return CommandResult.OK;
         }
@@ -214,12 +250,12 @@ public class Interpreter {
 
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
                 answ = new StackData((long)a.getData() + (long)b.getData(), Type.INT);
-            } else if ((a.getType() == Type.DOUBLE && b.getType() == Type.DOUBLE)
-                    || (a.getType() == Type.DOUBLE && b.getType() == Type.INT)
-                    || (a.getType() == Type.INT && b.getType() == Type.DOUBLE)) {
+            } else if ((a.getType() == Type.FLOAT && b.getType() == Type.FLOAT)
+                    || (a.getType() == Type.FLOAT && b.getType() == Type.INT)
+                    || (a.getType() == Type.INT && b.getType() == Type.FLOAT)) {
 
                 double tmpA = Double.parseDouble(a.getData().toString()), tmpB = Double.parseDouble(b.getData().toString());
-                answ = new StackData(tmpA + tmpB, Type.DOUBLE);
+                answ = new StackData(tmpA + tmpB, Type.FLOAT);
             } else if (a.getType() == Type.STRING && b.getType() == Type.STRING) {
                 answ = new StackData((String)a.getData() + (String)b.getData(), Type.STRING);
             } else {
@@ -248,12 +284,12 @@ public class Interpreter {
 
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
                 answ = new StackData((long)a.getData() - (long)b.getData(), Type.INT);
-            } else if ((a.getType() == Type.DOUBLE && b.getType() == Type.DOUBLE)
-                    || (a.getType() == Type.DOUBLE && b.getType() == Type.INT)
-                    || (a.getType() == Type.INT && b.getType() == Type.DOUBLE)) {
+            } else if ((a.getType() == Type.FLOAT && b.getType() == Type.FLOAT)
+                    || (a.getType() == Type.FLOAT && b.getType() == Type.INT)
+                    || (a.getType() == Type.INT && b.getType() == Type.FLOAT)) {
 
                 double tmpA = Double.parseDouble(a.getData().toString()), tmpB = Double.parseDouble(b.getData().toString());
-                answ = new StackData(tmpA - tmpB, Type.DOUBLE);
+                answ = new StackData(tmpA - tmpB, Type.FLOAT);
             } else {
                 Log.printError("ERROR: operator - not defined for " + a.toString() + " " + b.toString());
                 return CommandResult.ERROR;
@@ -502,12 +538,7 @@ public class Interpreter {
             if (info.stack.size() < arraySize)
                 return CommandResult.ERROR;
 
-            ArrayList<StackData> array = new ArrayList<>();
-
-            for (int i = 0; i < arraySize; i++)
-                array.add(info.stack.pop().clone());
-
-            info.stack.push(new StackData(array, Type.ARRAY));
+            info.stack.push(ObjectsFactory.createArray(info, arraySize));
             return CommandResult.OK;
         }
     }
@@ -619,7 +650,9 @@ public class Interpreter {
                 return CommandResult.ERROR;
             else {
                 ArrayList<StackData> sizes = (ArrayList<StackData>) st.getData();
-                info.stack.push(new StackData(createArrayN(sizes.size(), 1, sizes), Type.ARRAY));
+                if (sizes.size() != 0)
+                    info.stack.push(new StackData(createArrayN(sizes.size(), 1, sizes), Type.ARRAY));
+                else info.stack.push(new StackData(null, Type.NULL));
             }
             return CommandResult.OK;
         }
@@ -669,8 +702,8 @@ public class Interpreter {
             if (sd.getType() == Type.INT) {
                 info.stack.push(new StackData(-(long)sd.getData(), Type.INT));
             }
-            else if (sd.getType() == Type.DOUBLE) {
-                info.stack.push(new StackData(-(double)sd.getData(), Type.DOUBLE));
+            else if (sd.getType() == Type.FLOAT) {
+                info.stack.push(new StackData(-(double)sd.getData(), Type.FLOAT));
             }
             else {
                 Log.printError(currentCommand + "There isn't - operator for " + sd);
@@ -692,7 +725,7 @@ public class Interpreter {
             if (sd.getType() == Type.INT) {
                 sd.data = (long)sd.data + 1;
             }
-            else if (sd.getType() == Type.DOUBLE) {
+            else if (sd.getType() == Type.FLOAT) {
                 sd.data = (double)sd.data + 1.0;
             }
             else {
@@ -757,9 +790,21 @@ public class Interpreter {
             StackData callObject = info.stack.pop();
             String name = (String)currentCommand.getArgs()[0];
 
-            if (callObject.getType() == Type.ARRAY && name.equals("add") && argCount == 1) {
+            /*if (callObject.getType() == Type.ARRAY && name.equals("add") && argCount == 1) {
                 ArrayList<StackData> array = (ArrayList<StackData>)callObject.getData();
                 array.add(arguments[0]);
+            }
+            else {
+                Log.printError("Error! nothing methods " + currentCommand);
+                return CommandResult.ERROR;
+            }*/
+            FunctionAction func;
+            if ((func  = callObject.getMethod(name)) != null) {
+                if (func.getArgumentsCount() == arguments.length) {
+                    for (int i = arguments.length - 1; i >= 0; i--)
+                        info.stack.push(arguments[i]);
+                    func.Action(info);
+                }
             }
             else {
                 Log.printError("Error! nothing methods " + currentCommand);
@@ -769,8 +814,6 @@ public class Interpreter {
             return CommandResult.OK;
         }
     }
-
-
 
     public Stack<StackData> getStack() {
         return info.stack;

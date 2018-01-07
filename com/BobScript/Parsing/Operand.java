@@ -80,7 +80,7 @@ public class Operand {
                 addToken("}", Token.TokenTypes.DELIMITER, pr);
             }
             else if (operand.charAt(i) == '[') {
-                addToken("[", Token.TokenTypes.DELIMITER, pr + 20);
+                addToken("[", Token.TokenTypes.DELIMITER, pr + 34);
             }
             else if (operand.charAt(i) == ']') {
                 addToken("]", Token.TokenTypes.DELIMITER, pr);

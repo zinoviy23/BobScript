@@ -2,6 +2,7 @@ package com.BobScript.BobCode.Functions.BuiltInFunctions;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
+import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
@@ -21,7 +22,7 @@ public class ReadLineAction extends FunctionAction {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         try {
             String line = bufferedReader.readLine();
-            info.stack.push(new StackData(line, Type.STRING));
+            info.stack.push(ObjectsFactory.createString(line));
         } catch (IOException ex) {
 
         }

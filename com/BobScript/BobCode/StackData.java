@@ -1,5 +1,7 @@
 package com.BobScript.BobCode;
 
+import com.BobScript.BobCode.Functions.FunctionAction;
+
 import java.util.*;
 
 /**
@@ -14,6 +16,35 @@ public class StackData {
     protected Object data;
     protected Type type;
 
+    private HashMap<String, StackData> fields = new HashMap<>();
+    private HashMap<String, FunctionAction> methods = new HashMap<>();
+
+    /**
+     * Возвращает поле объекта
+     * @param name
+     * @return
+     */
+    public StackData getField(String name) {
+        return (!fields.containsKey(name)) ? null : fields.get(name);
+    }
+
+    /**
+     * Возвращает метод объекта
+     * @param name
+     * @return
+     */
+    public  FunctionAction getMethod(String name) {
+        return (!methods.containsKey(name)) ? null : methods.get(name);
+    }
+
+    public void setFields(HashMap<String, StackData> fields) {
+        this.fields = fields;
+    }
+
+    public void setMethods(HashMap<String, FunctionAction> methods) {
+        this.methods = methods;
+    }
+
     public StackData(Object data, Type type) {
         this.data = data;
         this.type = type;
@@ -23,6 +54,8 @@ public class StackData {
         StackData newValue = sd.clone();
         data = newValue.getData();
         type = newValue.getType();
+        setMethods(newValue.methods);
+        setFields(newValue.fields);
     }
 
     public void assignPointer(StackData sd) {
@@ -76,22 +109,50 @@ public class StackData {
 
     @Override
     public StackData clone() {
-        switch (type) {
-            case INT:
-            case DOUBLE:
-                return new StackData(data, type);
-            case STRING:
-                return new StackData(cloneString((String)data), type);
-            case ARRAY:
-                return new StackData(((ArrayList)data).clone(), type);
-            default:
-                return new StackData(data, type);
+        try {
+            super.clone();
+            switch (type) {
+                case INT:
+                case FLOAT:
+                    return new StackData(data, type);
+                case STRING:
+                    return ObjectsFactory.createString(cloneString((String)data));
+                case ARRAY:
+                    return ObjectsFactory.createArray((ArrayList<StackData>)((ArrayList) data).clone());
+                case FUNCTION:
+                    return ObjectsFactory.createFunction((FunctionAction) data);
+                default:
+                    return new StackData(data, type);
+            }
+        } catch (CloneNotSupportedException ex) {
+            switch (type) {
+                case INT:
+                case FLOAT:
+                    return new StackData(data, type);
+                case STRING:
+                    return ObjectsFactory.createString(cloneString((String)data));
+                case ARRAY:
+                    return ObjectsFactory.createArray((ArrayList<StackData>)((ArrayList) data).clone());
+                case FUNCTION:
+                    return ObjectsFactory.createFunction((FunctionAction) data);
+                default:
+                    return new StackData(data, type);
+            }
         }
+    }
+
+    private String methodsToString() {
+        StringBuilder stringBuilder = new StringBuilder("Methods {");
+        for (Map.Entry<String, FunctionAction> el : methods.entrySet()) {
+            stringBuilder.append(el.getKey()).append("(").append(el.getValue().getArgumentsCount()).append(") ");
+        }
+        stringBuilder.append("}");
+        return stringBuilder.toString();
     }
 
     @Override
     public String toString() {
-        if (data != null) return data.toString() + "->" + type.toString();
+        if (data != null) return data.toString() + "->" + type.toString() + ", " + methodsToString();
         else return "nothing->" + type.toString();
     }
 }
