@@ -14,7 +14,7 @@ public class Operand {
      */
     public static String[] keywords = {"var", "if", "end", "while", "func",
             "return", "delete", "for", "array", "break", "continue",
-    "else", "elif"};
+    "else", "elif", "do"};
 
     private static Set<String> keywordsSet;
 
@@ -64,14 +64,15 @@ public class Operand {
                 }
             }
             else if (operand.charAt(i) == ')') {
-                if (!isFunctionParenthesis.peek()) {
+                if (!isFunctionParenthesis.empty() && !isFunctionParenthesis.peek()) {
                     pr -= 40;
                     parenthesisCounter += 1;
                 }
                 else {
                     addToken(")", Token.TokenTypes.DELIMITER, pr);
                 }
-                isFunctionParenthesis.pop();
+                if (!isFunctionParenthesis.empty())
+                    isFunctionParenthesis.pop();
             }
             else if (operand.charAt(i) == '{') {
                 addToken("{", Token.TokenTypes.DELIMITER, pr);
@@ -279,6 +280,8 @@ public class Operand {
             case '>':
             case ':':
             case ';':
+            case '/':
+            case '%':
                 return true;
         }
         return false;
@@ -310,13 +313,13 @@ public class Operand {
             if (s.equals("+") || s.equals("-"))
                 return 14;
 
-            if (s.equals("*"))
+            if (s.equals("*") || s.equals("/") || s.equals("%"))
                 return 15;
 
             if (s.equals("."))
                 return 30;
             if (s.equals(":"))
-                return 31;
+                return 1;
 
             if (s.equals("<") || s.equals(">") || s.equals("=="))
                 return 4;
@@ -327,6 +330,8 @@ public class Operand {
             if (s.equals(",") || s.equals(";"))
                 return 2;
 
+            if (s.equals("->"))
+                return 33;
         }
         else {
             if (s.equals("-"))

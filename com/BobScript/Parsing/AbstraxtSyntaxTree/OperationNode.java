@@ -76,6 +76,12 @@ public class OperationNode extends TreeNode {
             case ">":
                 res.add(new Command(Commands.GREATER, ""));
                 break;
+            case "/":
+                res.add(new Command(Commands.DIV));
+                break;
+            case "%":
+                res.add(new Command(Commands.MOD));
+                break;
             case "==":
                 res.add(new Command(Commands.EQUAL, ""));
                 break;

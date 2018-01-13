@@ -22,7 +22,7 @@ public class CallMethodAction extends MethodAction {
     @Override
     public void Action(InterpreterInfo info) {
         if (!((FunctionAction)objectPointer.getData()).isBuiltinFunction()) {
-            info.functionStack.push(new Function(info.commandIndex, ((FunctionAction) objectPointer.getData())));
+            info.functionStack.push(new Function(info.commandIndex, ((FunctionAction) objectPointer.getData()), "kek"));
             info.functionStackSize++;
         }
         ((FunctionAction)objectPointer.getData()).Action(info);

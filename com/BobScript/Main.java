@@ -15,7 +15,6 @@ public class Main {
     private final static String BOB_SCRIPT_VERSION = "0.1.0";
 
     public static void main(String[] args) throws IOException {
-
         if (args.length != 0) {
             TreeNode.initDebugWriter("tree.txt");
             TreeParser parser = new TreeParser();
@@ -69,11 +68,11 @@ public class Main {
 
             Interpreter inter = new Interpreter();
             Log.init();
-            Log.printError("BobScript v " + BOB_SCRIPT_VERSION);
+            Log.printInfo("BobScript v " + BOB_SCRIPT_VERSION);
             long start = System.currentTimeMillis();
             inter.execute(compiled);
             double time = ((double) System.currentTimeMillis() - start) / 1000;
-            Log.printError(Double.toString(time));
+            Log.printInfo(Double.toString(time));
             Log.end();
 
             PrintWriter executeInfo = new PrintWriter(new File("Info.txt"));

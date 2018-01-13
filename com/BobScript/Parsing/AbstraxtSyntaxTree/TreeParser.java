@@ -1,11 +1,11 @@
 package com.BobScript.Parsing.AbstraxtSyntaxTree;
 
-import com.BobScript.BobCode.Interpreter;
 import com.BobScript.Parsing.*;
 import com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes.*;
 import com.BobScript.Support.TypeSupport;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Stack;
 
 public class TreeParser {
@@ -13,6 +13,11 @@ public class TreeParser {
     private ArrayList<TreeNode> tmp;
 
     private Stack<ComplexNode> currentParent;
+
+    // строка, в которой был do
+    private Operand doSavedLine;
+    // рассматривается ли сейчас do блок
+    private boolean isDoBlock = false;
 
     public TreeParser() {
         tmp = new ArrayList<>();
@@ -62,6 +67,8 @@ public class TreeParser {
                 case "==":
                 case "=":
                 case "+=":
+                case "/":
+                case "%":
                 case ",":
                 case ".":
                 case "++":
@@ -134,6 +141,43 @@ public class TreeParser {
                         line.remove(index + 1);
                     }
                     tmp.add(operation);
+                    return init(line);
+                }
+                // лямбда операция
+                case "->": {
+                    //System.out.println(line);
+                    ArrayList<FunctionDeclarationNode.ArgumentInfo> argumentInfo = new ArrayList<>();
+                    int argIndexStart;
+                    for (argIndexStart = index - 1; argIndexStart >= 0; argIndexStart--) {
+                        if (!line.get(argIndexStart).getToken().equals(",")) {
+                            if (argIndexStart == 0) {
+                                argumentInfo.add(new FunctionDeclarationNode.ArgumentInfo(line.get(argIndexStart).getToken(), ""));
+                            }
+                            else if (!line.get(argIndexStart - 1).getToken().equals(":")) {
+                                argumentInfo.add(new FunctionDeclarationNode.ArgumentInfo(line.get(argIndexStart).getToken(), ""));
+                                if (!line.get(argIndexStart - 1).getToken().equals(",")) {
+                                    argIndexStart--;
+                                    break;
+                                }
+                            } else {
+                                argumentInfo.add(new FunctionDeclarationNode.ArgumentInfo(
+                                        line.get(argIndexStart - 2).getToken(),
+                                        line.get(argIndexStart).getToken()
+                                ));
+                                argIndexStart -= 2;
+                                if (argIndexStart == 0 || !line.get(argIndexStart - 1).getToken().equals(",")) {
+                                    argIndexStart--;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    Collections.reverse(argumentInfo);
+                    LambdaFunctionNode lfn = new LambdaFunctionNode(argumentInfo, init(line.extractFrom(index + 1, line.size() - 1)));
+                    line.removeAll(index + 1, line.size());
+                    line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                    tmp.add(lfn);
+                    line.removeAll(argIndexStart + 1, index);
                     return init(line);
                 }
                 case "(": {
@@ -242,8 +286,21 @@ public class TreeParser {
                     int closeIndex = line.getCloseParenthesis(index + 2);
                     Operand arguments = line.extractFromParenthesis(index + 2, closeIndex);
                     for (int i = 0; i < arguments.size(); i++) {
-                        if (!arguments.get(i).getToken().equals(","))
-                            fdn.addArgument(arguments.get(i).getToken());
+                        if (!arguments.get(i).getToken().equals(",")) {
+                            if (i < arguments.size() - 2 && arguments.get(i + 1).getToken().equals(":")) {
+                                fdn.addArgument(new FunctionDeclarationNode.ArgumentInfo(
+                                        arguments.get(i).getToken(),
+                                        arguments.get(i + 2).getToken()
+                                ));
+                                i+=2;
+                            }
+                            else {
+                                fdn.addArgument(new FunctionDeclarationNode.ArgumentInfo(
+                                        arguments.get(i).getToken(),
+                                        ""
+                                ));
+                            }
+                        }
                     }
                     currentParent.push(fdn);
                     line.removeAll(index, closeIndex);
@@ -265,11 +322,25 @@ public class TreeParser {
                     return init(line);
                 }
 
+                case "do": {
+                    isDoBlock = true;
+                    doSavedLine = line.extractFrom(0, index - 1);
+                    currentParent.add(new DoBlockNode());
+                    return null;
+                }
+
                 case "end": {
-                    //if (currentParent.empty())
-                      //  return null;
                     if (currentParent.peek() instanceof Parentable) {
                         return ((Parentable)currentParent.pop()).findRoot();
+                    }
+                    if (isDoBlock) {
+                        isDoBlock = false;
+                        TreeNode doBlockNode = currentParent.pop();
+                        doSavedLine.addToken(new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                        for (int i = index + 1; i < line.size(); i++)
+                            doSavedLine.addToken(line.get(i));
+                        tmp.add(doBlockNode);
+                        return init(doSavedLine);
                     }
                     return currentParent.peek();
                 }

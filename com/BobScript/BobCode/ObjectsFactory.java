@@ -1,6 +1,7 @@
 package com.BobScript.BobCode;
 
 import com.BobScript.BobCode.Functions.BuiltinMethods.Array.AddMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Array.ConvertMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Array.ForEachMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Function.CallMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.LengthMethodAction;
@@ -34,7 +35,8 @@ public class ObjectsFactory {
         HashMap<String, FunctionAction> methods = new HashMap<>();
         methods.put("length", new com.BobScript.BobCode.Functions.BuiltinMethods.Array.LengthMetodAction(arrayObj));
         methods.put("add", new AddMethodAction(arrayObj));
-        methods.put("forEach", new ForEachMethodAction(arrayObj));
+        methods.put("convert", new ConvertMethodAction(arrayObj));
+        methods.put("foreach", new ForEachMethodAction(arrayObj));
         arrayObj.setMethods(methods);
 
         return arrayObj;
@@ -46,7 +48,8 @@ public class ObjectsFactory {
         HashMap<String, FunctionAction> methods = new HashMap<>();
         methods.put("length", new com.BobScript.BobCode.Functions.BuiltinMethods.Array.LengthMetodAction(arrayObj));
         methods.put("add", new AddMethodAction(arrayObj));
-        methods.put("forEach", new ForEachMethodAction(arrayObj));
+        methods.put("convert", new ConvertMethodAction(arrayObj));
+        methods.put("foreach", new ForEachMethodAction(arrayObj));
         arrayObj.setMethods(methods);
 
         return arrayObj;

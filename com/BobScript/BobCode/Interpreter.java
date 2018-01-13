@@ -24,6 +24,7 @@ public class Interpreter {
         info.interpreter = this;
         initCommandActions();
         initBuiltInFunctions();
+        Log.setInfo(info);
     }
 
     private void initBuiltInFunctions() {
@@ -71,16 +72,20 @@ public class Interpreter {
         commandActions[Commands.INCREMENT.ordinal()] = new IncrementAction();
         commandActions[Commands.GET_FIELD_FROM.ordinal()] = new GetFieldFromAction();
         commandActions[Commands.CALL_FROM.ordinal()] = new CallFromAction();
+        commandActions[Commands.MOD.ordinal()] = new ModAction();
+        commandActions[Commands.DIV.ordinal()] = new DivAction();
     }
 
     private Command[] currentProgram;
+
+    boolean errorExit = false;
 
     // run commands
     public int execute(Command[] program) {
         Command currentCommand;
         currentProgram = program;
         info.commandIndex = 0;
-        while (info.commandIndex < program.length) {
+        while (info.commandIndex < program.length && !errorExit) {
 
             currentCommand = program[info.commandIndex];
             //System.out.println(info.commandIndex + ": " + currentCommand);
@@ -108,12 +113,12 @@ public class Interpreter {
         else {
             int prevSize = info.functionStackSize;
             int prevCommandIndex = info.commandIndex;
-            info.functionStack.push(new Function(info.commandIndex, func));
+            info.functionStack.push(new Function(info.commandIndex, func, "kek"));
             info.functionStackSize++;
             func.Action(info);
             Command currentCommand;
             info.commandIndex++;
-            while (info.functionStackSize != prevSize) {
+            while (info.functionStackSize != prevSize && !errorExit) {
                 currentCommand = currentProgram[info.commandIndex];
                 //System.out.println(info.commandIndex + ": " + currentCommand);
                 CommandAction currentAction = commandActions[currentCommand.getCommand().ordinal()];
@@ -257,7 +262,7 @@ public class Interpreter {
                 double tmpA = Double.parseDouble(a.getData().toString()), tmpB = Double.parseDouble(b.getData().toString());
                 answ = new StackData(tmpA + tmpB, Type.FLOAT);
             } else if (a.getType() == Type.STRING && b.getType() == Type.STRING) {
-                answ = new StackData((String)a.getData() + (String)b.getData(), Type.STRING);
+                answ = new StackData(a.getData() + (String)b.getData(), Type.STRING);
             } else {
                 Log.printError("ERROR: operator + not defined for " + a.toString() + " " + b.toString());
                 return CommandResult.ERROR;
@@ -404,6 +409,59 @@ public class Interpreter {
         }
     }
 
+    // класс для деления
+    private class DivAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.size() < 2) {
+                Log.printError("Error: stack size too small");
+                return CommandResult.ERROR;
+            }
+
+            StackData b = info.stack.pop();
+            StackData a = info.stack.pop();
+            StackData answ = new StackData();
+            if (a.getType() == Type.INT && b.getType() == Type.INT) {
+                long tmpA = (long)a.getData(), tmpB = (long)b.getData();
+                if (tmpB == 0) {
+                    Log.printError("Error: division by zero" + currentCommand);
+                    return CommandResult.ERROR;
+                }
+                answ = new StackData(tmpA / tmpB, Type.INT);
+            }
+
+            info.stack.push(answ);
+
+            return CommandResult.OK;
+        }
+    }
+
+    private class ModAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.size() < 2) {
+                Log.printError("Error: stack size too small");
+                return CommandResult.ERROR;
+            }
+
+            StackData b = info.stack.pop();
+            StackData a = info.stack.pop();
+            StackData answ = new StackData();
+            if (a.getType() == Type.INT && b.getType() == Type.INT) {
+                long tmpA = (long)a.getData(), tmpB = (long)b.getData();
+                if (tmpB == 0) {
+                    Log.printError("Error: division by zero" + currentCommand);
+                    return CommandResult.ERROR;
+                }
+                answ = new StackData(tmpA % tmpB, Type.INT);
+            }
+
+            info.stack.push(answ);
+
+            return CommandResult.OK;
+        }
+    }
+
     // класс для сравнения меньше
     private class LesserAction implements CommandAction {
         @Override
@@ -512,7 +570,7 @@ public class Interpreter {
             if (tmp.isBuiltinFunction())
                 tmp.Action(info);
             else {
-                info.functionStack.push(new Function(info.commandIndex, tmp));
+                info.functionStack.push(new Function(info.commandIndex, tmp, functionName));
                 info.functionStackSize++;
                 tmp.Action(info);
             }
@@ -524,7 +582,10 @@ public class Interpreter {
     private class ArgumentAction implements CommandAction {
         @Override
         public CommandResult Action(Command currentCommand) {
-            info.stack.push(new StackData(currentCommand.getArgs()[0], Type.STRING));
+            if (currentCommand.getArgs()[1] == null)
+                info.stack.push(new StackData(currentCommand.getArgs()[0], Type.STRING));
+            else
+                info.stack.push(new StackData(currentCommand.getArgs()[0] + ":" + currentCommand.getArgs()[1], Type.STRING));
             return CommandResult.OK;
         }
     }
@@ -595,9 +656,19 @@ public class Interpreter {
         public CommandResult Action(Command currentCommand) {
             String name = (String)currentCommand.getArgs()[0];
             int countArgs = (int)currentCommand.getArgs()[1];
-            ArrayList<String> args = new ArrayList<>();
-            for (int i = 0; i < countArgs; i++)
-                args.add((String)info.stack.pop().data);
+            ArrayList<UsersFunctionAction.ArgumentInfo> args = new ArrayList<>();
+            for (int i = 0; i < countArgs; i++) {
+                String argInf = (String) info.stack.pop().data;
+                UsersFunctionAction.ArgumentInfo argumentInfo;
+                if (argInf.contains(":")) {
+                    String[] tmp = argInf.split(":");
+                    argumentInfo = new UsersFunctionAction.ArgumentInfo(tmp[0], tmp[1]);
+                }
+                else {
+                    argumentInfo = new UsersFunctionAction.ArgumentInfo(argInf, null);
+                }
+                args.add(argumentInfo);
+            }
 
             UsersFunctionAction newFunction = new UsersFunctionAction(info.commandIndex + 1, args);
             if (!info.functions.containsKey(name))
@@ -821,6 +892,11 @@ public class Interpreter {
 
     public Map<String, Variable> getVariables() {
         return info.variables;
+    }
+
+    public void errorExit() {
+        errorExit = true;
+        Log.printError("Error exit! because " + currentProgram[info.commandIndex]);
     }
 
     public Map<String, FunctionAction> getFunctions() { return info.functions; }

@@ -1,9 +1,7 @@
 package com.BobScript.BobCode.Functions;
 
-import com.BobScript.BobCode.Interpreter;
-import com.BobScript.BobCode.InterpreterInfo;
-import com.BobScript.BobCode.StackData;
-import com.BobScript.BobCode.Variable;
+import com.BobScript.BobCode.*;
+import com.sun.deploy.security.ValidationState;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -12,9 +10,18 @@ import java.util.Stack;
 
 public class UsersFunctionAction extends FunctionAction {
     private int startPosition;
-    private ArrayList<String> argumentsInfo;
+    private ArrayList<ArgumentInfo> argumentsInfo;
     private ArrayList<String> functionsVariables;
     private int startStackSize;
+
+    public static class ArgumentInfo {
+        public String name, type;
+
+        public ArgumentInfo(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
+    }
 
 
     @Override
@@ -22,7 +29,7 @@ public class UsersFunctionAction extends FunctionAction {
         return argumentsInfo.size();
     }
 
-    public UsersFunctionAction(int startPosition, ArrayList<String> argumentsInfo) {
+    public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo) {
         isBuiltin = false;
         this.startPosition = startPosition;
         this.argumentsInfo = argumentsInfo;
@@ -41,12 +48,25 @@ public class UsersFunctionAction extends FunctionAction {
      * @param info информация об состоянии интерпритатора
      */
     private void initArguments(InterpreterInfo info) {
-        for (String arg : argumentsInfo) {
+        for (ArgumentInfo arg : argumentsInfo) {
             StackData argumentValue = info.stack.pop();
             Variable argument = new Variable();
             argument.assignCopy(argumentValue);
+            if (arg.type == null ||
+                    arg.type.equals("Int") && argument.getType() == Type.INT ||
+                    arg.type.equals("Float") && argument.getType() == Type.FLOAT ||
+                    arg.type.equals("Array") && argument.getType() == Type.ARRAY ||
+                    arg.type.equals("String") && argument.getType() == Type.STRING ||
+                    arg.type.equals("Boolean") && argument.getType() == Type.BOOLEAN ||
+                    arg.type.equals("Function") && argument.getType() == Type.FUNCTION) {
+                info.variables.put(info.functionStackSize + "#" + arg.name, argument);
+            }
+            else {
+                Log.printError("ERROR: Wrong argument type! " + arg.name + " : " + arg.type + " and " + argument.getType());
+                info.interpreter.errorExit();
+                return;
+            }
 
-            info.variables.put(info.functionStackSize + "#" + arg, argument);
         }
     }
 
@@ -73,8 +93,8 @@ public class UsersFunctionAction extends FunctionAction {
      *
      */
     public void endFunction(InterpreterInfo info) {
-        for (String arg : argumentsInfo)
-            info.variables.remove(info.functionStackSize + "#" + arg);
+        for (ArgumentInfo arg : argumentsInfo)
+            info.variables.remove(info.functionStackSize + "#" + arg.name);
         for (String arg : functionsVariables)
             info.variables.remove(arg);
     }
