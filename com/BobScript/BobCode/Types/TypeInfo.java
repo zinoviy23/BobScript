@@ -36,6 +36,7 @@ public class TypeInfo {
     public static TypeInfo stringTypeInfo;
     public static TypeInfo arrayTypeInfo;
     public static TypeInfo fileTypeInfo;
+    public static TypeInfo rangeTypeInfo;
 
     static {
         stringTypeInfo = new TypeInfo();
@@ -64,6 +65,11 @@ public class TypeInfo {
         fields.add("name");
         fileTypeInfo.fields = fields;
         fileTypeInfo.methods = methods;
+
+        rangeTypeInfo = new TypeInfo();
+        methods = new HashMap<>();
+        methods.put("foreach", new com.BobScript.BobCode.Functions.BuiltinMethods.Range.ForEachMethodAction());
+        rangeTypeInfo.methods = methods;
     }
 
     public TypeInfo() {

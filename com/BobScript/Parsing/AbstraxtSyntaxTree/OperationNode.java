@@ -94,6 +94,9 @@ public class OperationNode extends TreeNode {
             case "+=":
                 res.add(new Command(Commands.ASSIGN_ADD, ""));
                 break;
+            case "..":
+                res.add(new Command(Commands.RANGE));
+                break;
             case ".":
                 if (right instanceof VariableNode)
                     res.add(new Command(Commands.GET_FIELD_FROM, ((VariableNode)right).getName()));

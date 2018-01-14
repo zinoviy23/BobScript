@@ -1,6 +1,7 @@
 package com.BobScript.BobCode;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
+import com.BobScript.BobCode.Types.Range;
 import com.BobScript.BobCode.Types.TypeInfo;
 
 import java.io.BufferedReader;
@@ -40,5 +41,9 @@ public class ObjectsFactory {
         fields.put("name", nameField);
         obj.setFields(fields);
         return obj;
+    }
+
+    public static StackData createRange(long start, long end) {
+        return new StackData(new Range(start, end), Type.RANGE, TypeInfo.rangeTypeInfo);
     }
 }

@@ -324,6 +324,9 @@ public class Operand {
             if (s.equals("*") || s.equals("/") || s.equals("%"))
                 return 15;
 
+            if (s.equals(".."))
+                return 10;
+
             if (s.equals("."))
                 return 30;
             if (s.equals(":"))

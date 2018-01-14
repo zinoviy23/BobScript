@@ -7,6 +7,7 @@ import com.BobScript.BobCode.Functions.FunctionAction;
 import java.util.*;
 
 import com.BobScript.BobCode.Functions.UsersFunctionAction;
+import com.BobScript.BobCode.Types.Range;
 import com.BobScript.BobCode.Types.TypeInfo;
 import com.BobScript.Support.*;
 import org.jetbrains.annotations.Nullable;
@@ -76,6 +77,7 @@ public class Interpreter {
         commandActions[Commands.CALL_FROM.ordinal()] = new CallFromAction();
         commandActions[Commands.MOD.ordinal()] = new ModAction();
         commandActions[Commands.DIV.ordinal()] = new DivAction();
+        commandActions[Commands.RANGE.ordinal()] = new RangeAction();
     }
 
     private Command[] currentProgram;
@@ -893,6 +895,20 @@ public class Interpreter {
                 return CommandResult.ERROR;
             }
 
+            return CommandResult.OK;
+        }
+    }
+
+    private class RangeAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.size() < 2) {
+                Log.printError("Error! stack size too small");
+                return CommandResult.ERROR;
+            }
+            StackData end = info.stack.pop();
+            StackData start = info.stack.pop();
+            info.stack.push(ObjectsFactory.createRange((long)start.getData(), (long)end.getData()));
             return CommandResult.OK;
         }
     }

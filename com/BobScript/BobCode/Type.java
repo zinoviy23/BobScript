@@ -4,7 +4,7 @@ package com.BobScript.BobCode;
  * Created by zinov on 20.02.2016.
  */
 public enum Type {
-    NULL, INT, FLOAT, STRING, ARRAY, SET, MAP, BOOLEAN, FUNCTION, FILE;
+    NULL, INT, FLOAT, STRING, ARRAY, SET, MAP, BOOLEAN, FUNCTION, FILE, RANGE;
 
     @Override
     public String toString() {
@@ -29,6 +29,8 @@ public enum Type {
                 return "function";
             case FILE:
                 return "file";
+            case RANGE:
+                return "range";
             default:
                 return "unknown";
         }

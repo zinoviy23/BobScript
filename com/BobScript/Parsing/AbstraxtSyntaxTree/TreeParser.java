@@ -83,7 +83,8 @@ public class TreeParser {
                 case ",":
                 case ".":
                 case "++":
-                case ":": {
+                case ":":
+                case "..": {
                     Token left = line.get(index - 1);
                     Token right = line.get(index + 1);
 
