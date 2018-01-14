@@ -1,16 +1,12 @@
 package com.BobScript.BobCode.Functions.BuiltinMethods.String;
 
+import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.Functions.MethodAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
-public class LengthMethodAction extends MethodAction {
-
-    public LengthMethodAction(StackData obj) {
-        super(obj);
-    }
-
+public class LengthMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
         return 0;
@@ -18,7 +14,8 @@ public class LengthMethodAction extends MethodAction {
 
     @Override
     public void Action(InterpreterInfo info) {
-        int len = ((String)objectPointer.getData()).length();
+        StackData obj = info.stack.pop();
+        long len = ((String)obj.getData()).length();
         info.stack.push(new StackData(len, Type.INT));
     }
 

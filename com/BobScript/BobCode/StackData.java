@@ -1,6 +1,7 @@
 package com.BobScript.BobCode;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
+import com.BobScript.BobCode.Types.TypeInfo;
 
 import java.util.*;
 
@@ -10,11 +11,10 @@ import java.util.*;
  * class for elements of stack
  * type and data
  */
-
-
 public class StackData {
     protected Object data;
     protected Type type;
+    private TypeInfo typeInfo;
 
     private HashMap<String, StackData> fields = new HashMap<>();
     private HashMap<String, FunctionAction> methods = new HashMap<>();
@@ -34,7 +34,7 @@ public class StackData {
      * @return
      */
     public  FunctionAction getMethod(String name) {
-        return (!methods.containsKey(name)) ? null : methods.get(name);
+        return typeInfo.getMethod(name);
     }
 
     public void setFields(HashMap<String, StackData> fields) {
@@ -54,8 +54,7 @@ public class StackData {
         StackData newValue = sd.clone();
         data = newValue.getData();
         type = newValue.getType();
-        setMethods(newValue.methods);
-        setFields(newValue.fields);
+        typeInfo = newValue.typeInfo;
     }
 
     public void assignPointer(StackData sd) {
@@ -68,7 +67,14 @@ public class StackData {
         this.type = Type.NULL;
     }
 
+    public StackData(Object data, Type type, TypeInfo typeInfo) {
+        this.data = data;
+        this.type = type;
+        this.typeInfo = typeInfo;
+    }
+
     public Object getData() { return data; }
+
     public Type getType() { return type; }
 
 
@@ -152,7 +158,7 @@ public class StackData {
 
     @Override
     public String toString() {
-        if (data != null) return data.toString() + "->" + type.toString() + ", " + methodsToString();
+        if (data != null) return data.toString() + "->" + type.toString() + ", " + typeInfo;
         else return "nothing->" + type.toString();
     }
 }

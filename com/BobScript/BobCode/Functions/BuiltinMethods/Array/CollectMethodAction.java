@@ -1,13 +1,13 @@
 package com.BobScript.BobCode.Functions.BuiltinMethods.Array;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
-import com.BobScript.BobCode.Functions.MethodAction;
 import com.BobScript.BobCode.InterpreterInfo;
+import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
 
 import java.util.ArrayList;
 
-public class ForEachMethodAction extends FunctionAction {
+public class CollectMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
         return 1;
@@ -15,13 +15,20 @@ public class ForEachMethodAction extends FunctionAction {
 
     @Override
     public void Action(InterpreterInfo info) {
-        StackData obj = info.stack.pop();
-        ArrayList<StackData> current = ((ArrayList<StackData>) obj.getData());
+        ArrayList<StackData> array = (ArrayList<StackData>)info.stack.pop().getData();
+        ArrayList<StackData> newArray = new ArrayList<>();
         FunctionAction func = (FunctionAction)info.stack.pop().getData();
-        for (StackData el : current) {
+
+        for (StackData el : array) {
             info.stack.push(el);
             info.interpreter.callFunction(func);
+            boolean result = (boolean)info.stack.pop().getData();
+            if (result) {
+                newArray.add(el.clone());
+            }
         }
+
+        info.stack.push(ObjectsFactory.createArray(newArray));
     }
 
     @Override

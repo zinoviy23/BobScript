@@ -25,7 +25,7 @@ public class TreeParser {
     }
 
     public TreeNode createNode(Operand line) {
-        tmp.clear();
+        //tmp.clear();
         TreeNode tmpRes = init(line);
         if (currentParent.empty())
             return tmpRes;
@@ -323,6 +323,7 @@ public class TreeParser {
                 }
 
                 case "do": {
+                    //System.out.println("Line: " + line + "\n");
                     isDoBlock = true;
                     doSavedLine = line.extractFrom(0, index - 1);
                     currentParent.add(new DoBlockNode());
@@ -330,16 +331,18 @@ public class TreeParser {
                 }
 
                 case "end": {
+                    //System.out.println("LineEnd: " + line + "\n");
                     if (currentParent.peek() instanceof Parentable) {
                         return ((Parentable)currentParent.pop()).findRoot();
                     }
-                    if (isDoBlock) {
+                    if (isDoBlock && currentParent.peek() instanceof DoBlockNode) {
                         isDoBlock = false;
                         TreeNode doBlockNode = currentParent.pop();
                         doSavedLine.addToken(new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
                         for (int i = index + 1; i < line.size(); i++)
                             doSavedLine.addToken(line.get(i));
                         tmp.add(doBlockNode);
+                        //System.out.println("LineKek: " + doSavedLine + "\n");
                         return init(doSavedLine);
                     }
                     return currentParent.peek();

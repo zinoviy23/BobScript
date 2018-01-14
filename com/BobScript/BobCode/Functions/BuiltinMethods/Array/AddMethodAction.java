@@ -1,16 +1,13 @@
 package com.BobScript.BobCode.Functions.BuiltinMethods.Array;
 
+import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.Functions.MethodAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 
 import java.util.ArrayList;
 
-public class AddMethodAction extends MethodAction {
-    public AddMethodAction(StackData obj) {
-        super(obj);
-    }
-
+public class AddMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
         return 1;
@@ -18,8 +15,9 @@ public class AddMethodAction extends MethodAction {
 
     @Override
     public void Action(InterpreterInfo info) {
+        StackData obj = info.stack.pop();
         StackData el = info.stack.pop();
-        ((ArrayList<StackData>)objectPointer.getData()).add(el);
+        ((ArrayList<StackData>)obj.getData()).add(el);
     }
 
     @Override

@@ -8,11 +8,7 @@ import com.BobScript.BobCode.StackData;
 
 import java.util.ArrayList;
 
-public class ConvertMethodAction extends MethodAction {
-    public ConvertMethodAction(StackData obj) {
-        super(obj);
-    }
-
+public class ConvertMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
         return 1;
@@ -20,7 +16,8 @@ public class ConvertMethodAction extends MethodAction {
 
     @Override
     public void Action(InterpreterInfo info) {
-        ArrayList<StackData> current = (ArrayList<StackData>)objectPointer.getData();
+        StackData obj = info.stack.pop();
+        ArrayList<StackData> current = (ArrayList<StackData>)obj.getData();
         ArrayList<StackData> newArray = new ArrayList<>();
 
         FunctionAction func = (FunctionAction) info.stack.pop().getData();

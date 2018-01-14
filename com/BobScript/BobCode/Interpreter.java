@@ -7,6 +7,7 @@ import com.BobScript.BobCode.Functions.FunctionAction;
 import java.util.*;
 
 import com.BobScript.BobCode.Functions.UsersFunctionAction;
+import com.BobScript.BobCode.Types.TypeInfo;
 import com.BobScript.Support.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -203,22 +204,6 @@ public class Interpreter {
                     return CommandResult.ERROR;
             }
 
-            /*if (TypeSupport.tryInt(args[0])) {
-                stack.add(new StackData(Long.parseLong(args[0]), Type.INT));
-            } else if (TypeSupport.tryDouble(args[0])) {
-                stack.add(new StackData(Double.parseDouble(args[0]), Type.FLOAT));
-            } else if (TypeSupport.tryConstString(args[0])) {
-                stack.add(new StackData(TypeSupport.toConstString(args[0]), Type.STRING));
-            } else if (TypeSupport.tryBoolean(args[0])) {
-                stack.add(new StackData(Boolean.parseBoolean(args[0]), Type.BOOLEAN));
-            } else if (TypeSupport.tryNull(args[0])) {
-                stack.add(new StackData(null, Type.NULL));
-            } else if (variables.containsKey(args[0])) {
-                stack.add(variables.get(args[0]).clone());
-            } else {
-                Log.printError("ERROR: " + currentCommand + "unknown type");
-                return CommandResult.ERROR;
-            }*/
             return CommandResult.OK;
         }
     }
@@ -562,17 +547,49 @@ public class Interpreter {
         @Override
         public CommandResult Action(Command currentCommand) {
             String functionName = (String)currentCommand.getArgs()[0];
-            if (!functionName.contains(functionName))
+            if (info.functions.containsKey(functionName)) {
+                FunctionAction tmp = info.functions.get(functionName);
+                if (tmp.getArgumentsCount() != (int) currentCommand.getArgs()[1])
+                    return CommandResult.ERROR;
+                if (tmp.isBuiltinFunction())
+                    tmp.Action(info);
+                else {
+                    info.functionStack.push(new Function(info.commandIndex, tmp, functionName));
+                    info.functionStackSize++;
+                    tmp.Action(info);
+                }
+            } else if (info.variables.containsKey(info.functionStackSize + "#" + functionName)) {
+                StackData fObj = info.variables.get(info.functionStackSize + "#" + functionName);
+                if (fObj.getType() != Type.FUNCTION) {
+                    Log.printError("Error! " + functionName + "is not function");
+                    return CommandResult.ERROR;
+                }
+                FunctionAction func = (FunctionAction)fObj.getData();
+                if (func.isBuiltinFunction()) {
+                    func.Action(info);
+                } else {
+                    info.functionStack.push(new Function(info.commandIndex, func, "kek"));
+                    info.functionStackSize++;
+                    func.Action(info);
+                }
+            }
+            else if (info.variables.containsKey(functionName)) {
+                StackData fObj = info.variables.get(functionName);
+                if (fObj.getType() != Type.FUNCTION) {
+                    Log.printError("Error! " + functionName + "is not function");
+                    return CommandResult.ERROR;
+                }
+                FunctionAction func = (FunctionAction)fObj.getData();
+                if (func.isBuiltinFunction()) {
+                    func.Action(info);
+                } else {
+                    info.functionStack.push(new Function(info.commandIndex, func, "kek"));
+                    info.functionStackSize++;
+                    func.Action(info);
+                }
+            } else {
+                Log.printError("Error! " + "cannot call " + functionName);
                 return CommandResult.ERROR;
-            FunctionAction tmp = info.functions.get(functionName);
-            if (tmp.getArgumentsCount() != (int)currentCommand.getArgs()[1])
-                return CommandResult.ERROR;
-            if (tmp.isBuiltinFunction())
-                tmp.Action(info);
-            else {
-                info.functionStack.push(new Function(info.commandIndex, tmp, functionName));
-                info.functionStackSize++;
-                tmp.Action(info);
             }
             return CommandResult.OK;
         }
@@ -861,19 +878,12 @@ public class Interpreter {
             StackData callObject = info.stack.pop();
             String name = (String)currentCommand.getArgs()[0];
 
-            /*if (callObject.getType() == Type.ARRAY && name.equals("add") && argCount == 1) {
-                ArrayList<StackData> array = (ArrayList<StackData>)callObject.getData();
-                array.add(arguments[0]);
-            }
-            else {
-                Log.printError("Error! nothing methods " + currentCommand);
-                return CommandResult.ERROR;
-            }*/
             FunctionAction func;
             if ((func  = callObject.getMethod(name)) != null) {
                 if (func.getArgumentsCount() == arguments.length) {
                     for (int i = arguments.length - 1; i >= 0; i--)
                         info.stack.push(arguments[i]);
+                    info.stack.push(callObject);
                     func.Action(info);
                 }
             }
