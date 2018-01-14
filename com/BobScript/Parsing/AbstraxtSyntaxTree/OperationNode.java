@@ -105,6 +105,7 @@ public class OperationNode extends TreeNode {
                     tmp.setPointCall(true);
                     res.addAll(Arrays.asList(tmp.compile()));
                 }
+                break;
         }
         return arrayListToArray(res);
     }

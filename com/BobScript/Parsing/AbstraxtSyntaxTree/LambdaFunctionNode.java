@@ -33,6 +33,16 @@ public class LambdaFunctionNode extends TreeNode {
         this.body = body;
     }
 
+    private boolean isVoid = false;
+
+    public boolean isVoid() {
+        return isVoid;
+    }
+
+    public void setVoid(boolean aVoid) {
+        isVoid = aVoid;
+    }
+
     @Override
     public void debugPrint(int level) {
         drawLevel(level);
@@ -63,7 +73,7 @@ public class LambdaFunctionNode extends TreeNode {
         commands.add(new Command(Commands.FUNCTION, name, argumentInfo.size()));
         lambdaFunctionCounter++;
         commands.addAll(Arrays.asList(body.compile()));
-        if (!(body instanceof DoBlockNode))
+        if (!(body instanceof DoBlockNode) && !isVoid)
             commands.add(new Command(Commands.RETURN, true));
         commands.add(new Command(Commands.END_FUNCTION));
         commands.add(new Command(Commands.PUSH, 'v', name));

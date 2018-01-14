@@ -694,8 +694,13 @@ public class Interpreter {
             if (!info.functions.containsKey(name))
                 info.functions.put(name, newFunction);
 
+            int balance = 0;
             for (int i = info.commandIndex; i < currentProgram.length; i++) {
-                if (currentProgram[i].getCommand() == Commands.END_FUNCTION) {
+                if (currentProgram[i].getCommand() == Commands.FUNCTION)
+                    balance++;
+                if (currentProgram[i].getCommand() == Commands.END_FUNCTION)
+                    balance--;
+                if (balance == 0) {
                     info.commandIndex = i;
                     return CommandResult.OK;
                 }

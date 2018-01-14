@@ -14,7 +14,7 @@ public class Operand {
      */
     public static String[] keywords = {"var", "if", "end", "while", "func",
             "return", "delete", "for", "array", "break", "continue",
-    "else", "elif", "do"};
+    "else", "elif", "do", "void"};
 
     private static Set<String> keywordsSet;
 
@@ -327,8 +327,6 @@ public class Operand {
             if (s.equals(".."))
                 return 10;
 
-            if (s.equals("."))
-                return 30;
             if (s.equals(":"))
                 return 1;
 
@@ -351,8 +349,12 @@ public class Operand {
         }
         if (s.equals("->"))
             return 33;
+        if (s.equals("."))
+            return 30;
         if (s.equals("\\\\"))
             return 2000;
+        if (s.equals("void"))
+            return 1;
         if (isKeyword(s))
             return 1000;
         return 1;
@@ -367,5 +369,13 @@ public class Operand {
     private static void initKeywords() {
         keywordsSet = new HashSet<>();
         keywordsSet.addAll(Arrays.asList(keywords));
+    }
+
+    public String getLine() {
+        StringBuilder sb = new StringBuilder();
+        for (Token tk : tokens) {
+            sb.append(tk.getToken()).append(tk.getPriority()).append(" ");
+        }
+        return sb.toString();
     }
 }

@@ -15,9 +15,7 @@ public class TreeParser {
     private Stack<ComplexNode> currentParent;
 
     // строка, в которой был do
-    private Operand doSavedLine;
-    // рассматривается ли сейчас do блок
-    private boolean isDoBlock = false;
+    private Stack<Operand> doSavedLineStack;
 
     // пропущена ли последняя строка
     private boolean isPreviousLinePass = false;
@@ -27,6 +25,7 @@ public class TreeParser {
     public TreeParser() {
         tmp = new ArrayList<>();
         currentParent = new Stack<>();
+        doSavedLineStack = new Stack<>();
     }
 
     public TreeNode createNode(Operand line) {
@@ -57,7 +56,6 @@ public class TreeParser {
             return null;
 
         Token tk = line.get(index);
-
         if (tk.isForParsing()) {
             return tmp.get(Integer.parseInt(tk.getToken()));
         }
@@ -185,7 +183,14 @@ public class TreeParser {
                     }
 
                     //Collections.reverse(argumentInfo);
+                    boolean isVoid = false;
+                    if (index < line.size() - 1 && line.get(index + 1).getToken().equals("void")) {
+                        isVoid = true;
+                        line.remove(index + 1);
+                    }
+
                     LambdaFunctionNode lfn = new LambdaFunctionNode(argumentInfo, init(line.extractFrom(index + 1, line.size() - 1)));
+                    lfn.setVoid(isVoid);
                     line.removeAll(index + 1, line.size());
                     line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
                     tmp.add(lfn);
@@ -347,8 +352,7 @@ public class TreeParser {
 
                 case "do": {
                     //System.out.println("Line: " + line + "\n");
-                    isDoBlock = true;
-                    doSavedLine = line.extractFrom(0, index - 1);
+                    doSavedLineStack.push(line.extractFrom(0, index - 1));
                     currentParent.add(new DoBlockNode());
                     return null;
                 }
@@ -358,8 +362,8 @@ public class TreeParser {
                     if (currentParent.peek() instanceof Parentable) {
                         return ((Parentable)currentParent.pop()).findRoot();
                     }
-                    if (isDoBlock && currentParent.peek() instanceof DoBlockNode) {
-                        isDoBlock = false;
+                    if (!doSavedLineStack.empty() && currentParent.peek() instanceof DoBlockNode) {
+                        Operand doSavedLine = doSavedLineStack.pop();
                         TreeNode doBlockNode = currentParent.pop();
                         doSavedLine.addToken(new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
                         for (int i = index + 1; i < line.size(); i++)
