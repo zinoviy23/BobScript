@@ -19,6 +19,11 @@ public class TreeParser {
     // рассматривается ли сейчас do блок
     private boolean isDoBlock = false;
 
+    // пропущена ли последняя строка
+    private boolean isPreviousLinePass = false;
+    // пропущенная строка
+    private Operand passedLine;
+
     public TreeParser() {
         tmp = new ArrayList<>();
         currentParent = new Stack<>();
@@ -55,6 +60,12 @@ public class TreeParser {
 
         if (tk.isForParsing()) {
             return tmp.get(Integer.parseInt(tk.getToken()));
+        }
+
+        if (!tk.getToken().equals("\\\\") && isPreviousLinePass) {
+            isPreviousLinePass = false;
+            passedLine.addTokens(line);
+            return init(passedLine);
         }
 
         if (tk.isDelimiter()) {
@@ -147,38 +158,49 @@ public class TreeParser {
                 case "->": {
                     //System.out.println(line);
                     ArrayList<FunctionDeclarationNode.ArgumentInfo> argumentInfo = new ArrayList<>();
-                    int argIndexStart;
-                    for (argIndexStart = index - 1; argIndexStart >= 0; argIndexStart--) {
-                        if (!line.get(argIndexStart).getToken().equals(",")) {
-                            if (argIndexStart == 0) {
-                                argumentInfo.add(new FunctionDeclarationNode.ArgumentInfo(line.get(argIndexStart).getToken(), ""));
-                            }
-                            else if (!line.get(argIndexStart - 1).getToken().equals(":")) {
-                                argumentInfo.add(new FunctionDeclarationNode.ArgumentInfo(line.get(argIndexStart).getToken(), ""));
-                                if (!line.get(argIndexStart - 1).getToken().equals(",")) {
-                                    argIndexStart--;
-                                    break;
-                                }
-                            } else {
+                    int argStartIndex;
+                    for (argStartIndex = index - 2; argStartIndex >= 0; argStartIndex--) {
+                        if (line.get(argStartIndex).getToken().equals("|"))
+                            break;
+                    }
+
+                    Operand arguments = line.extractFrom(argStartIndex + 1, index - 2);
+                    //System.out.println(arguments);
+                    for (int i = 0; i < arguments.size(); i++) {
+                        if (!arguments.get(i).getToken().equals(",")) {
+                            if (i < arguments.size() - 2 && arguments.get(i + 1).getToken().equals(":")) {
                                 argumentInfo.add(new FunctionDeclarationNode.ArgumentInfo(
-                                        line.get(argIndexStart - 2).getToken(),
-                                        line.get(argIndexStart).getToken()
+                                   arguments.get(i).getToken(),
+                                   arguments.get(i + 2).getToken()
                                 ));
-                                argIndexStart -= 2;
-                                if (argIndexStart == 0 || !line.get(argIndexStart - 1).getToken().equals(",")) {
-                                    argIndexStart--;
-                                    break;
-                                }
+                                i+=2;
+                            }
+                            else {
+                                argumentInfo.add(new FunctionDeclarationNode.ArgumentInfo(
+                                        arguments.get(i).getToken(), ""
+                                ));
                             }
                         }
                     }
-                    Collections.reverse(argumentInfo);
+
+                    //Collections.reverse(argumentInfo);
                     LambdaFunctionNode lfn = new LambdaFunctionNode(argumentInfo, init(line.extractFrom(index + 1, line.size() - 1)));
                     line.removeAll(index + 1, line.size());
                     line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
                     tmp.add(lfn);
-                    line.removeAll(argIndexStart + 1, index);
+                    line.removeAll(argStartIndex, index);
                     return init(line);
+                }
+                // операция переноса строки
+                case "\\\\": {
+                    if (!isPreviousLinePass) {
+                        passedLine = line.extractFrom(0, index - 1);
+                        isPreviousLinePass = true;
+                    }
+                    else {
+                        passedLine.addTokens(line.extractFrom(0, index - 1));
+                    }
+                    return null;
                 }
                 case "(": {
                     int closeIndex = line.getCloseParenthesis(index);

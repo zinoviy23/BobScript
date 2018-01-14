@@ -4,9 +4,12 @@ import com.BobScript.BobCode.Functions.BuiltinMethods.Array.AddMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Array.CollectMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Array.ConvertMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Array.ForEachMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.File.ReadLineMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.String.JoinMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.LengthMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.SplitMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.SubstringMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.ToStrMethodAction;
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.StackData;
 
@@ -32,6 +35,7 @@ public class TypeInfo {
 
     public static TypeInfo stringTypeInfo;
     public static TypeInfo arrayTypeInfo;
+    public static TypeInfo fileTypeInfo;
 
     static {
         stringTypeInfo = new TypeInfo();
@@ -39,6 +43,8 @@ public class TypeInfo {
         methods.put("length", new LengthMethodAction());
         methods.put("split", new SplitMethodAction());
         methods.put("substring", new SubstringMethodAction());
+        methods.put("toStr", new ToStrMethodAction());
+        methods.put("join", new JoinMethodAction());
         stringTypeInfo.methods = methods;
 
         arrayTypeInfo = new TypeInfo();
@@ -48,7 +54,16 @@ public class TypeInfo {
         methods.put("foreach", new ForEachMethodAction());
         methods.put("add", new AddMethodAction());
         methods.put("collect", new CollectMethodAction());
+        methods.put("toStr", new ToStrMethodAction());
         arrayTypeInfo.methods = methods;
+
+        fileTypeInfo = new TypeInfo();
+        methods = new HashMap<>();
+        methods.put("readLine", new ReadLineMethodAction());
+        ArrayList<String> fields = new ArrayList<>();
+        fields.add("name");
+        fileTypeInfo.fields = fields;
+        fileTypeInfo.methods = methods;
     }
 
     public TypeInfo() {

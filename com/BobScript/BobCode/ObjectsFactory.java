@@ -3,7 +3,9 @@ package com.BobScript.BobCode;
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.Types.TypeInfo;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Фабрика объектов
@@ -29,5 +31,14 @@ public class ObjectsFactory {
 
     public static StackData createFunction(FunctionAction function) {
         return new StackData(function, Type.FUNCTION);
+    }
+
+    public static StackData createFile(BufferedReader reader, String name) {
+        StackData obj = new StackData(reader, Type.FILE, TypeInfo.fileTypeInfo);
+        StackData nameField = createString(name);
+        HashMap<String, StackData> fields = new HashMap<>();
+        fields.put("name", nameField);
+        obj.setFields(fields);
+        return obj;
     }
 }

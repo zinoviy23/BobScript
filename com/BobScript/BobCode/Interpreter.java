@@ -36,6 +36,7 @@ public class Interpreter {
         info.functions.put("println", new PrintlnAction());
         info.functions.put("random", new RandomAction());
         info.functions.put("createNArray", new CreateNArrayAction());
+        info.functions.put("open", new OpenFunctionAction());
     }
 
     // иницилизирует действия команд

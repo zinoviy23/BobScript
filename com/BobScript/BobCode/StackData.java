@@ -3,6 +3,7 @@ package com.BobScript.BobCode;
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.Types.TypeInfo;
 
+import java.io.BufferedReader;
 import java.util.*;
 
 /**
@@ -127,6 +128,8 @@ public class StackData {
                     return ObjectsFactory.createArray((ArrayList<StackData>)((ArrayList) data).clone());
                 case FUNCTION:
                     return ObjectsFactory.createFunction((FunctionAction) data);
+                case FILE:
+                    return ObjectsFactory.createFile((BufferedReader)data, (String)fields.get("name").getData());
                 default:
                     return new StackData(data, type);
             }
@@ -141,6 +144,8 @@ public class StackData {
                     return ObjectsFactory.createArray((ArrayList<StackData>)((ArrayList) data).clone());
                 case FUNCTION:
                     return ObjectsFactory.createFunction((FunctionAction) data);
+                case FILE:
+                    return ObjectsFactory.createFile((BufferedReader)data, (String)fields.get("name").getData());
                 default:
                     return new StackData(data, type);
             }

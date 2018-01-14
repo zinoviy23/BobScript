@@ -4,8 +4,7 @@ package com.BobScript.BobCode;
  * Created by zinov on 20.02.2016.
  */
 public enum Type {
-    NULL, INT, FLOAT, STRING, ARRAY, SET, MAP, BOOLEAN, FUNCTION;
-
+    NULL, INT, FLOAT, STRING, ARRAY, SET, MAP, BOOLEAN, FUNCTION, FILE;
 
     @Override
     public String toString() {
@@ -28,14 +27,14 @@ public enum Type {
                 return "boolean";
             case FUNCTION:
                 return "function";
+            case FILE:
+                return "file";
             default:
                 return "unknown";
         }
     }
 
     public boolean isCopy() {
-        if (this == INT || this == NULL || this == FLOAT)
-            return true;
-        return false;
+        return this == INT || this == NULL || this == FLOAT;
     }
 }

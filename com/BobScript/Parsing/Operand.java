@@ -142,6 +142,12 @@ public class Operand {
         return tokens.get(i);
     }
 
+    public void addTokens(@NotNull Operand line) {
+        for (int i = 0; i < line.size(); i++) {
+            addToken(line.get(i));
+        }
+    }
+
     public void pop(int i) { tokens.remove(i); }
 
     public int size() { return tokens.size(); }
@@ -282,6 +288,8 @@ public class Operand {
             case ';':
             case '/':
             case '%':
+            case '\\':
+            case '|':
                 return true;
         }
         return false;
@@ -330,8 +338,6 @@ public class Operand {
             if (s.equals(",") || s.equals(";"))
                 return 2;
 
-            if (s.equals("->"))
-                return 33;
         }
         else {
             if (s.equals("-"))
@@ -340,6 +346,10 @@ public class Operand {
             if (s.equals("++"))
                 return 20;
         }
+        if (s.equals("->"))
+            return 33;
+        if (s.equals("\\\\"))
+            return 2000;
         if (isKeyword(s))
             return 1000;
         return 1;
