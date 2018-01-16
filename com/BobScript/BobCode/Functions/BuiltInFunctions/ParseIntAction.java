@@ -5,6 +5,10 @@ import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
+/**
+ * Class for parseInt function <br>
+ *     gets string and convert it to <b>Int</b>
+ */
 public class ParseIntAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

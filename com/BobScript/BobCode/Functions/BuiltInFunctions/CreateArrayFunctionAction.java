@@ -7,6 +7,11 @@ import com.BobScript.BobCode.Type;
 
 import java.util.ArrayList;
 
+/**
+ * Class for function "createArray" <br>
+ * create array of null and with given length
+ */
+@Deprecated
 public class CreateArrayFunctionAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

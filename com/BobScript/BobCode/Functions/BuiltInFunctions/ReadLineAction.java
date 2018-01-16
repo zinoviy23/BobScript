@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Stack;
 
+/**
+ * Class for "readLine" function <br>
+ *     read line in stdin
+ */
 public class ReadLineAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

@@ -5,6 +5,10 @@ import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 
+/**
+ * Class for "println" function <br>
+ *     gets string, print it and goes to new line
+ */
 public class PrintlnAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

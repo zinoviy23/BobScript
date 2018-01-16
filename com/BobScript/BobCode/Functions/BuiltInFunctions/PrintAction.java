@@ -4,6 +4,10 @@ import com.BobScript.BobCode.Functions.BuiltinMethods.ToStrMethodAction;
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
+import com.BobScript.BobCode.Variable;
+
+import java.util.Map;
+import java.util.Set;
 
 public class PrintAction extends FunctionAction {
     @Override

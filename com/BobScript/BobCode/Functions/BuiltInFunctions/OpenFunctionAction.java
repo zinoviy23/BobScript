@@ -9,6 +9,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * Class for "open" function <br>
+ *     open file and read it or write at it
+ */
 public class OpenFunctionAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

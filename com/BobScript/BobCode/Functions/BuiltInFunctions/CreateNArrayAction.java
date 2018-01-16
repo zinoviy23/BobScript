@@ -9,8 +9,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * Класс для функции, генерирующей н мерный массив
+ * Class for function "createNarray" <br>
+ *     puts array of dimensions and creates dimensional array
  */
+@Deprecated
 public class CreateNArrayAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
@@ -36,6 +38,7 @@ public class CreateNArrayAction extends FunctionAction {
      * @return массив
      */
     @Nullable
+    @Deprecated
     private ArrayList<StackData> createArrayN(int n, int current, ArrayList<StackData> sizes) {
         if (sizes.get(current - 1).getType() != Type.INT)
             return null;

@@ -1,22 +1,37 @@
 package com.BobScript.BobCode.Functions;
 
 import com.BobScript.BobCode.*;
-import com.sun.deploy.security.ValidationState;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 
+/**
+ * Class for user function actions
+ */
 public class UsersFunctionAction extends FunctionAction {
     private int startPosition;
     private ArrayList<ArgumentInfo> argumentsInfo;
-    private ArrayList<String> functionsVariables;
+
     private int startStackSize;
+    public int parentFunctionStackSize;
 
+    /**
+     * Class for information about argument
+     */
     public static class ArgumentInfo {
-        public String name, type;
+        /**
+         * name parameter
+         */
+        public String name;
+        /**
+         * type parameter
+         */
+        public String type;
 
+        /**
+         * Constructor
+         * @param name argument name
+         * @param type argument type
+         */
         public ArgumentInfo(String name, String type) {
             this.name = name;
             this.type = type;
@@ -29,23 +44,23 @@ public class UsersFunctionAction extends FunctionAction {
         return argumentsInfo.size();
     }
 
-    public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo) {
+    public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo, int parentFunctionStackSize) {
         isBuiltin = false;
         this.startPosition = startPosition;
         this.argumentsInfo = argumentsInfo;
+        this.parentFunctionStackSize = parentFunctionStackSize;
     }
 
     @Override
     public void Action(InterpreterInfo info) {
         info.commandIndex = startPosition - 1;
-        functionsVariables = new ArrayList<>();
         initArguments(info);
         startStackSize = info.stack.size();
     }
 
     /**
-     * Создаёт переменные аргумент
-     * @param info информация об состоянии интерпритатора
+     * Create argument variables
+     * @param info interpreter info
      */
     private void initArguments(InterpreterInfo info) {
         for (ArgumentInfo arg : argumentsInfo) {
@@ -71,9 +86,9 @@ public class UsersFunctionAction extends FunctionAction {
     }
 
     /**
-     * Очищает стек до состояния, в котором он был до вызова
-     * @param info
-     * @param isReturnSomething
+     * Clears stack to position, that it was before calling
+     * @param info interpreter information
+     * @param isReturnSomething true if function returns something and false else
      */
     public void clearStackExit(InterpreterInfo info, boolean isReturnSomething) {
         if (!isReturnSomething)
@@ -88,20 +103,15 @@ public class UsersFunctionAction extends FunctionAction {
     }
 
     /**
-     * Завершает выполнение функции
-     * @param info информация об состоянии интерпритатора
+     * Stops function executing
+     * @param info interpreter info
      *
      */
     public void endFunction(InterpreterInfo info) {
         for (ArgumentInfo arg : argumentsInfo)
             info.variables.remove(info.functionStackSize + "#" + arg.name);
-        for (String arg : functionsVariables)
-            info.variables.remove(arg);
     }
 
-    public void addVariable(String name) {
-        functionsVariables.add(name);
-    }
 
 
 }

@@ -1,6 +1,7 @@
 package com.BobScript.BobCode;
 
 import com.BobScript.BobCode.Functions.BuiltInFunctions.*;
+import com.BobScript.BobCode.Functions.BuiltinMethods.ToStrMethodAction;
 import com.BobScript.BobCode.Functions.Function;
 import com.BobScript.BobCode.Functions.FunctionAction;
 
@@ -109,7 +110,6 @@ public class Interpreter {
     }
 
     public void callFunction(FunctionAction func) {
-        //System.out.println("lollll");
         if (func.isBuiltinFunction()) {
             func.Action(info);
             return;
@@ -117,7 +117,7 @@ public class Interpreter {
         else {
             int prevSize = info.functionStackSize;
             int prevCommandIndex = info.commandIndex;
-            info.functionStack.push(new Function(info.commandIndex, func, "kek"));
+            info.functionStack.push(new Function(info.commandIndex, func, "kek", info.functionStackSize));
             info.functionStackSize++;
             func.Action(info);
             Command currentCommand;
@@ -163,7 +163,6 @@ public class Interpreter {
         public CommandResult Action(Command currentCommand) {
             char pushParam = (char)currentCommand.getArgs()[0];
             Object pushData = currentCommand.getArgs()[1];
-            //System.err.println(currentCommand);
             switch (pushParam) {
                 // integer
                 case 'i':
@@ -176,7 +175,7 @@ public class Interpreter {
                 // string
                 case 's':
                     //info.stack.add(new StackData(TypeSupport.toConstString((String)pushData), Type.STRING));
-                    info.stack.add(ObjectsFactory.createString(TypeSupport.toConstString((String)pushData)));
+                    info.stack.add(ObjectsFactory.createString(TypeSupport.toConstString((String) pushData)));
                     break;
                 // null
                 case 'n':
@@ -187,20 +186,28 @@ public class Interpreter {
                     info.stack.add(new StackData(pushData, Type.BOOLEAN));
                     break;
                 // variable
-                case 'v':
-                    if (info.variables.containsKey(info.functionStackSize + "#" + pushData)) {
+                case 'v': {
+                    /*if (info.variables.containsKey(info.functionStackSize + "#" + pushData)) {
                         info.stack.add(info.variables.get(info.functionStackSize + "#" + pushData));
                     } else if (info.variables.containsKey(pushData)) {
                         info.stack.add(info.variables.get(pushData));
-                    } else if(info.functions.containsKey(pushData)) {
+                    }  else if(info.functions.containsKey(pushData)) {
                         info.stack.push(ObjectsFactory.createFunction(info.functions.get(pushData)));
-                    }
-                    else {
-                        System.out.println("lol");
-                        Log.printError("Error: " + currentCommand + " nothing variables");
-                        return CommandResult.ERROR;
-                    }
-                    break;
+                    }*/
+                    StackData tmp;
+                    if (info.functionStackSize != 0 && (tmp = info.functionStack.peek().getVariable((String) pushData, info)) != null) {
+                        info.stack.add(tmp);
+                    } else if (info.variables.containsKey(pushData)) {
+                        info.stack.add(info.variables.get(pushData));
+                    }else if(info.functions.containsKey(pushData)) {
+                        info.stack.push(ObjectsFactory.createFunction(info.functions.get(pushData)));
+                    } else {
+                    System.out.println("lol");
+                    Log.printError("Error: " + currentCommand + " nothing variables");
+                    return CommandResult.ERROR;
+                }
+                break;
+            }
                 // error
                 default:
                     Log.printError("ERROR: " + currentCommand + "unknown type");
@@ -249,8 +256,15 @@ public class Interpreter {
 
                 double tmpA = Double.parseDouble(a.getData().toString()), tmpB = Double.parseDouble(b.getData().toString());
                 answ = new StackData(tmpA + tmpB, Type.FLOAT);
-            } else if (a.getType() == Type.STRING && b.getType() == Type.STRING) {
-                answ = new StackData(a.getData() + (String)b.getData(), Type.STRING);
+            } else if (a.getType() == Type.STRING || b.getType() == Type.STRING) {
+                answ = ObjectsFactory.createString(ToStrMethodAction.ObjectToString(a) + ToStrMethodAction.ObjectToString(b));
+            } else if (a.getType() == Type.ARRAY && b.getType() == Type.ARRAY) {
+                ArrayList<StackData> newArray = new ArrayList<>();
+                for (StackData el : (ArrayList<StackData>)a.getData())
+                    newArray.add(el.clone());
+                for (StackData el : (ArrayList<StackData>)b.getData())
+                    newArray.add(el.clone());
+                answ = ObjectsFactory.createArray(newArray);
             } else {
                 Log.printError("ERROR: operator + not defined for " + a.toString() + " " + b.toString());
                 return CommandResult.ERROR;
@@ -549,6 +563,7 @@ public class Interpreter {
     private class CallAction implements CommandAction {
         @Override
         public CommandResult Action(Command currentCommand) {
+
             String functionName = (String)currentCommand.getArgs()[0];
             if (info.functions.containsKey(functionName)) {
                 FunctionAction tmp = info.functions.get(functionName);
@@ -557,7 +572,7 @@ public class Interpreter {
                 if (tmp.isBuiltinFunction())
                     tmp.Action(info);
                 else {
-                    info.functionStack.push(new Function(info.commandIndex, tmp, functionName));
+                    info.functionStack.push(new Function(info.commandIndex, tmp, functionName, info.functionStackSize));
                     info.functionStackSize++;
                     tmp.Action(info);
                 }
@@ -571,7 +586,7 @@ public class Interpreter {
                 if (func.isBuiltinFunction()) {
                     func.Action(info);
                 } else {
-                    info.functionStack.push(new Function(info.commandIndex, func, "kek"));
+                    info.functionStack.push(new Function(info.commandIndex, func, "kek", info.functionStackSize));
                     info.functionStackSize++;
                     func.Action(info);
                 }
@@ -586,7 +601,7 @@ public class Interpreter {
                 if (func.isBuiltinFunction()) {
                     func.Action(info);
                 } else {
-                    info.functionStack.push(new Function(info.commandIndex, func, "kek"));
+                    info.functionStack.push(new Function(info.commandIndex, func, "kek", info.functionStackSize));
                     info.functionStackSize++;
                     func.Action(info);
                 }
@@ -640,7 +655,7 @@ public class Interpreter {
             else {
                 if (!info.variables.containsKey(info.functionStackSize + "#" + name)) {
                     info.variables.put(info.functionStackSize + "#" + name, new Variable());
-                    ((UsersFunctionAction)info.functionStack.peek().action).addVariable(info.functionStackSize + "#" + name);
+                    info.functionStack.peek().addVariable(info.functionStackSize + "#" + name);
                 }
 
                 info.stack.push(info.variables.get(info.functionStackSize + "#" + name));
@@ -690,8 +705,12 @@ public class Interpreter {
                 args.add(argumentInfo);
             }
 
-            UsersFunctionAction newFunction = new UsersFunctionAction(info.commandIndex + 1, args);
-            if (!info.functions.containsKey(name))
+            UsersFunctionAction newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize);
+
+            // let it be.
+            if (!Character.isDigit(name.charAt(0)) && !info.functions.containsKey(name))
+                info.functions.put(name, newFunction);
+            else if (Character.isDigit(name.charAt(0)))
                 info.functions.put(name, newFunction);
 
             int balance = 0;
@@ -716,6 +735,7 @@ public class Interpreter {
         public CommandResult Action(Command currentCommand) {
             Function function = info.functionStack.pop();
             ((UsersFunctionAction)function.action).clearStackExit(info, false);
+            function.deleteVariables(info);
             ((UsersFunctionAction)function.action).endFunction(info);
             info.commandIndex = function.returnPosition;
             info.functionStackSize--;
@@ -730,6 +750,7 @@ public class Interpreter {
             Function function = info.functionStack.pop();
             boolean isReturnSomething = (boolean)currentCommand.getArgs()[0];
             ((UsersFunctionAction)function.action).clearStackExit(info, isReturnSomething);
+            function.deleteVariables(info);
             ((UsersFunctionAction)function.action).endFunction(info);
             info.commandIndex = function.returnPosition;
             info.functionStackSize--;

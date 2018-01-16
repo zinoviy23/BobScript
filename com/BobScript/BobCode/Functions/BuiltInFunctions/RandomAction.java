@@ -7,8 +7,12 @@ import com.BobScript.BobCode.Type;
 
 import java.util.Random;
 
+/**
+ * Class for "random" function <br>
+ *     gets two Ints and crete random Int between them
+ */
 public class RandomAction extends FunctionAction {
-    Random rand = new Random();
+    private Random rand = new Random();
 
     @Override
     public int getArgumentsCount() {

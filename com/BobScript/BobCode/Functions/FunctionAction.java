@@ -6,26 +6,29 @@ import com.BobScript.BobCode.StackData;
 import java.util.Stack;
 
 /**
- * Абстрактный класс для представления действия функции
+ * Abstract class for all functions
  */
 public abstract class FunctionAction {
+    /**
+     * boolean value that says is function builtin or users
+     */
     protected boolean isBuiltin = true;
 
     /**
-     * Количество аргументов функции
-     * @return целое число, кол-во аргументов
+     * Count argumnets of function
+     * @return integer numbers, count of arguments
      */
     public abstract int getArgumentsCount();
 
     /**
-     * Действие функции
-     * @param info информация об состоянии интерпретатора
+     * Function action
+     * @param info interpreter info
      */
     public abstract void Action(InterpreterInfo info);
 
     /**
-     * Является ли функция встроенной
-     * @return true, если является
+     * Is function builtin
+     * @return true if yes, is it
      */
     public boolean isBuiltinFunction() {return isBuiltin; }
 
