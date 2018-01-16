@@ -8,7 +8,7 @@ Script Language
 
 [Справка и Документация](https://github.com/zinoviy23/BobScript/wiki) 
 
-[Документация кода](zinoviy23.github.io)
+[Документация кода](https://zinoviy23.github.io/)
 
 ## Цели для версии 0.2
 - [x] Методы
