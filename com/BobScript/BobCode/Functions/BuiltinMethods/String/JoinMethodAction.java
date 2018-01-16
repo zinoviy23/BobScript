@@ -8,6 +8,10 @@ import com.BobScript.BobCode.StackData;
 
 import java.util.ArrayList;
 
+/**
+ * Class for "join" method of string <br>
+ *     converts given array to string and separates elements with this object
+ */
 public class JoinMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

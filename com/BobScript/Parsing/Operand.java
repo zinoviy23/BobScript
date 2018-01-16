@@ -344,6 +344,9 @@ public class Operand {
             if (s.equals("-"))
                 return 20;
 
+            if (s.equals("+"))
+                return 14;
+
             if (s.equals("++"))
                 return 20;
         }

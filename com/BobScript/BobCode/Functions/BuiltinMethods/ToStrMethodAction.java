@@ -8,6 +8,10 @@ import com.BobScript.BobCode.Type;
 
 import java.util.ArrayList;
 
+/**
+ * Class for "toStr" method of Object <br>
+ *     convert object to string
+ */
 public class ToStrMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
@@ -25,6 +29,11 @@ public class ToStrMethodAction extends FunctionAction {
         return super.isBuiltinFunction();
     }
 
+    /**
+     * Convert given object to string
+     * @param obj object
+     * @return string, that represent object
+     */
     public static String ObjectToString(StackData obj) {
         if (obj.getType() != Type.ARRAY) {
             if (obj.getType() != Type.NULL)

@@ -1,12 +1,15 @@
 package com.BobScript.BobCode.Functions.BuiltinMethods.Array;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
-import com.BobScript.BobCode.Functions.MethodAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 
 import java.util.ArrayList;
 
+/**
+ * Class for "add" method of arrays <br>
+ *     add element in array
+ */
 public class AddMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

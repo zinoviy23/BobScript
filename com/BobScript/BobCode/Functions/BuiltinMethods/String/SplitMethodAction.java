@@ -1,7 +1,6 @@
 package com.BobScript.BobCode.Functions.BuiltinMethods.String;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
-import com.BobScript.BobCode.Functions.MethodAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
@@ -9,6 +8,10 @@ import com.BobScript.BobCode.Type;
 
 import java.util.ArrayList;
 
+/**
+ * Class for "split" method of string <br>
+ *     split this string with given regexp
+ */
 public class SplitMethodAction extends FunctionAction {
 
     @Override

@@ -1,13 +1,16 @@
 package com.BobScript.BobCode.Functions.BuiltinMethods.Array;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
-import com.BobScript.BobCode.Functions.MethodAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
 
 import java.util.ArrayList;
 
+/**
+ * Class for convert method of array <br>
+ *     gets function and convert array elements with it
+ */
 public class ConvertMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

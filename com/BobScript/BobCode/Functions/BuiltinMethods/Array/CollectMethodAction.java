@@ -7,6 +7,10 @@ import com.BobScript.BobCode.StackData;
 
 import java.util.ArrayList;
 
+/**
+ * Class for collect method of array <br>
+ *     gets function-predicate and returns array of elements, that satisfy it
+ */
 public class CollectMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

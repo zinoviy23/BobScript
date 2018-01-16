@@ -10,8 +10,17 @@ import java.util.ArrayList;
  * Information about current called function
  */
 public class Function {
+    /**
+     * command position that must be after the function stops
+     */
     public int returnPosition;
+    /**
+     * function body
+     */
     public FunctionAction action;
+    /**
+     * function name
+     */
     public String name;
     private int stackIndex;
     private ArrayList<String> functionsVariables;

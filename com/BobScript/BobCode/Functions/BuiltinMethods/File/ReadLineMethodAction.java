@@ -9,6 +9,10 @@ import com.BobScript.BobCode.Type;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+/**
+ * Class for "readLine" method of File <br>
+ *     read one line from file
+ */
 public class ReadLineMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

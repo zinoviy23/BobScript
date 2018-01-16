@@ -5,7 +5,10 @@ import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Types.Range;
 
-
+/**
+ * Class for "foreach" method of Range <br>
+ *     for all elements in range calls given function
+ */
 public class ForEachMethodAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

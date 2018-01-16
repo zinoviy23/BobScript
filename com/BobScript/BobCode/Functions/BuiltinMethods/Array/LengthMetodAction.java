@@ -1,13 +1,16 @@
 package com.BobScript.BobCode.Functions.BuiltinMethods.Array;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
-import com.BobScript.BobCode.Functions.MethodAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
 import java.util.ArrayList;
 
+/**
+ * Class for "length" method of array <br>
+ *     returns length of array
+ */
 public class LengthMetodAction extends FunctionAction {
 
     @Override
