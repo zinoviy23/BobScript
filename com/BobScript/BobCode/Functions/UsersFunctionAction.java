@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class UsersFunctionAction extends FunctionAction {
     private int startPosition;
     private ArrayList<ArgumentInfo> argumentsInfo;
+    private ArgumentInfo thisInfo = null;
 
     private int startStackSize;
     public int parentFunctionStackSize;
@@ -38,17 +39,27 @@ public class UsersFunctionAction extends FunctionAction {
         }
     }
 
-
     @Override
     public int getArgumentsCount() {
         return argumentsInfo.size();
     }
 
+    /**
+     * Standard constructor
+     * @param startPosition first body element index
+     * @param argumentsInfo information about arguments
+     * @param parentFunctionStackSize index in size of function, that it was declared in
+     */
     public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo, int parentFunctionStackSize) {
         isBuiltin = false;
         this.startPosition = startPosition;
         this.argumentsInfo = argumentsInfo;
         this.parentFunctionStackSize = parentFunctionStackSize;
+    }
+
+    public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo, int parentFunctionStackSize, boolean isMethod) {
+        this(startPosition, argumentsInfo, parentFunctionStackSize);
+        thisInfo = new ArgumentInfo("this",null);
     }
 
     @Override
@@ -63,6 +74,12 @@ public class UsersFunctionAction extends FunctionAction {
      * @param info interpreter info
      */
     private void initArguments(InterpreterInfo info) {
+        if (thisInfo != null) {
+            StackData argumentValue = info.stack.pop();
+            Variable argument = new Variable();
+            argument.assignCopy(argumentValue);
+            info.variables.put(info.functionStackSize + "#" + thisInfo.name, argument);
+        }
         for (ArgumentInfo arg : argumentsInfo) {
             StackData argumentValue = info.stack.pop();
             Variable argument = new Variable();
@@ -108,6 +125,9 @@ public class UsersFunctionAction extends FunctionAction {
      *
      */
     public void endFunction(InterpreterInfo info) {
+        if (thisInfo != null) {
+            info.variables.remove(info.functionStackSize + "#" + thisInfo.name);
+        }
         for (ArgumentInfo arg : argumentsInfo)
             info.variables.remove(info.functionStackSize + "#" + arg.name);
     }

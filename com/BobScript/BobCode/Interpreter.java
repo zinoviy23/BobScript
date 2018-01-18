@@ -79,6 +79,7 @@ public class Interpreter {
         commandActions[Commands.MOD.ordinal()] = new ModAction();
         commandActions[Commands.DIV.ordinal()] = new DivAction();
         commandActions[Commands.RANGE.ordinal()] = new RangeAction();
+        commandActions[Commands.ADD_METHOD.ordinal()] = new AddMethodAction();
     }
 
     private Command[] currentProgram;
@@ -401,8 +402,11 @@ public class Interpreter {
             StackData a = info.stack.pop();
             StackData answ = new StackData();
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
-                long tmpA = Long.parseLong(a.getData().toString()), tmpB = Long.parseLong(b.getData().toString());
+                long tmpA = (long)a.getData(), tmpB = (long)b.getData();
                 answ = new StackData(tmpA * tmpB, Type.INT);
+            } else if (a.getType() == Type.FLOAT && b.getType() == Type.FLOAT) {
+                double tmpA = (double)a.getData(), tmpB = (double)b.getData();
+                answ = new StackData(tmpA * tmpB, Type.FLOAT);
             }
 
             info.stack.push(answ);
@@ -705,7 +709,11 @@ public class Interpreter {
                 args.add(argumentInfo);
             }
 
-            UsersFunctionAction newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize);
+            UsersFunctionAction newFunction;
+            if (currentCommand.getArgs().length == 3)
+                newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize, true);
+            else
+                newFunction= new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize);
 
             // let it be.
             if (!Character.isDigit(name.charAt(0)) && !info.functions.containsKey(name))
@@ -913,7 +921,13 @@ public class Interpreter {
                     for (int i = arguments.length - 1; i >= 0; i--)
                         info.stack.push(arguments[i]);
                     info.stack.push(callObject);
-                    func.Action(info);
+                    if (func.isBuiltinFunction())
+                        func.Action(info);
+                    else {
+                        info.functionStack.push(new Function(info.commandIndex, func, "method", info.functionStackSize));
+                        info.functionStackSize++;
+                        func.Action(info);
+                    }
                 }
             }
             else {
@@ -935,6 +949,23 @@ public class Interpreter {
             StackData end = info.stack.pop();
             StackData start = info.stack.pop();
             info.stack.push(ObjectsFactory.createRange((long)start.getData(), (long)end.getData()));
+            return CommandResult.OK;
+        }
+    }
+
+    private class AddMethodAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            if (info.stack.size() < 2) {
+                Log.printError("Error! can't add method to nothing!");
+                return CommandResult.ERROR;
+            }
+            FunctionAction action = (FunctionAction) info.stack.pop().getData();
+            StackData obj = info.stack.pop();
+            String name = (String)currentCommand.getArgs()[0];
+            info.functions.remove(name);
+            name = name.substring(3);
+            obj.addMethod(name, action);
             return CommandResult.OK;
         }
     }

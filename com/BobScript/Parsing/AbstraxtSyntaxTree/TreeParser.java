@@ -310,9 +310,28 @@ public class TreeParser {
 
                 case "func": {
                     String name = line.get(index + 1).getToken();
-                    FunctionDeclarationNode fdn = new FunctionDeclarationNode(name);
-                    int closeIndex = line.getCloseParenthesis(index + 2);
-                    Operand arguments = line.extractFromParenthesis(index + 2, closeIndex);
+                    FunctionDeclarationNode fdn;
+                    int nameEndIndex;
+                    if (!line.get(index + 2).getToken().equals(".")) {
+                        fdn = new FunctionDeclarationNode(name);
+                        nameEndIndex = index + 2;
+
+                    } else {
+                        Operand argName = new Operand(name);
+
+                        for (nameEndIndex = index + 2; nameEndIndex < line.size(); nameEndIndex++) {
+                            if (line.get(nameEndIndex).getToken().equals("("))
+                                break;
+                            argName.addToken(line.get(nameEndIndex));
+                        }
+                        String currentName = argName.get(argName.size() - 1).getToken();
+                        argName.removeAll(argName.size() - 2, argName.size());
+                        fdn = new FunctionDeclarationNode(currentName);
+                        fdn.setObjectNode(init(argName));
+                    }
+
+                    int closeIndex = line.getCloseParenthesis(nameEndIndex);
+                    Operand arguments = line.extractFromParenthesis(nameEndIndex, closeIndex);
                     for (int i = 0; i < arguments.size(); i++) {
                         if (!arguments.get(i).getToken().equals(",")) {
                             if (i < arguments.size() - 2 && arguments.get(i + 1).getToken().equals(":")) {
@@ -320,9 +339,8 @@ public class TreeParser {
                                         arguments.get(i).getToken(),
                                         arguments.get(i + 2).getToken()
                                 ));
-                                i+=2;
-                            }
-                            else {
+                                i += 2;
+                            } else {
                                 fdn.addArgument(new FunctionDeclarationNode.ArgumentInfo(
                                         arguments.get(i).getToken(),
                                         ""

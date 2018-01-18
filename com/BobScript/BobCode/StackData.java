@@ -35,6 +35,8 @@ public class StackData {
      * @return
      */
     public  FunctionAction getMethod(String name) {
+        if (methods.containsKey(name))
+            return methods.get(name);
         return typeInfo.getMethod(name);
     }
 
@@ -56,11 +58,16 @@ public class StackData {
         data = newValue.getData();
         type = newValue.getType();
         typeInfo = newValue.typeInfo;
+        methods = sd.methods;
     }
 
     public void assignPointer(StackData sd) {
         data = sd.getData();
         type = sd.getType();
+    }
+
+    public void addMethod(String name, FunctionAction action) {
+        methods.put(name, action);
     }
 
     public StackData() {
@@ -118,38 +125,30 @@ public class StackData {
     public StackData clone() {
         try {
             super.clone();
-            switch (type) {
-                case INT:
-                case FLOAT:
-                    return new StackData(data, type);
-                case STRING:
-                    return ObjectsFactory.createString(cloneString((String)data));
-                case ARRAY:
-                    return ObjectsFactory.createArray((ArrayList<StackData>)((ArrayList) data).clone());
-                case FUNCTION:
-                    return ObjectsFactory.createFunction((FunctionAction) data);
-                case FILE:
-                    return ObjectsFactory.createFile((BufferedReader)data, (String)fields.get("name").getData());
-                default:
-                    return new StackData(data, type);
-            }
-        } catch (CloneNotSupportedException ex) {
-            switch (type) {
-                case INT:
-                case FLOAT:
-                    return new StackData(data, type);
-                case STRING:
-                    return ObjectsFactory.createString(cloneString((String)data));
-                case ARRAY:
-                    return ObjectsFactory.createArray((ArrayList<StackData>)((ArrayList) data).clone());
-                case FUNCTION:
-                    return ObjectsFactory.createFunction((FunctionAction) data);
-                case FILE:
-                    return ObjectsFactory.createFile((BufferedReader)data, (String)fields.get("name").getData());
-                default:
-                    return new StackData(data, type);
-            }
+        } catch (CloneNotSupportedException ex) { }
+        StackData newStackData;
+        switch (type) {
+            case INT:
+            case FLOAT:
+                newStackData =  new StackData(data, type);
+                break;
+            case STRING:
+                newStackData = ObjectsFactory.createString(cloneString((String)data));
+                break;
+            case ARRAY:
+                newStackData =  ObjectsFactory.createArray((ArrayList<StackData>)((ArrayList) data).clone());
+                break;
+            case FUNCTION:
+                newStackData = ObjectsFactory.createFunction((FunctionAction) data);
+                break;
+            case FILE:
+                newStackData = ObjectsFactory.createFile((BufferedReader)data, (String)fields.get("name").getData());
+                break;
+            default:
+                newStackData = new  StackData(data, type);
+                break;
         }
+        return newStackData;
     }
 
     private String methodsToString() {
@@ -163,7 +162,7 @@ public class StackData {
 
     @Override
     public String toString() {
-        if (data != null) return data.toString() + "->" + type.toString() + ", " + typeInfo;
+        if (data != null) return data.toString() + "->" + type.toString() + ", " + typeInfo + ",\n" + methodsToString();
         else return "nothing->" + type.toString();
     }
 }

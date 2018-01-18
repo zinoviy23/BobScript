@@ -71,6 +71,9 @@ public class LambdaFunctionNode extends TreeNode {
                     (!argumentInfo.get(i).type.equals("") ? argumentInfo.get(i).type : null)));
         String name = Integer.toString(lambdaFunctionCounter) + "_L";
         commands.add(new Command(Commands.FUNCTION, name, argumentInfo.size()));
+        commands.add(new Command(Commands.CREATE_OR_PUSH, "lambda"));
+        commands.add(new Command(Commands.PUSH, 'v' ,name));
+        commands.add(new Command(Commands.ASSIGN));
         lambdaFunctionCounter++;
         commands.addAll(Arrays.asList(body.compile()));
         if (!(body instanceof DoBlockNode) && !isVoid)

@@ -33,7 +33,7 @@ public class Function {
      */
     public StackData getVariable(String name, InterpreterInfo info) {
         int parentStackIndex = ((UsersFunctionAction)action).parentFunctionStackSize - 1;
-        //System.out.println(parentStackIndex + " " + name + " kek");
+        //System.out.println(stackIndex + " " + name + " kek");
         if (info.variables.containsKey((stackIndex + 1) + "#" + name)) {
             return info.variables.get((stackIndex + 1) + "#" + name);
         } else if (parentStackIndex >= 0) {

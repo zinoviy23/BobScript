@@ -7,7 +7,7 @@ public enum Commands {
     EXIT, PUSH, ASSIGN, DELETE, ADD, SUB, LESSER, GREATER, EQUAL, CONDITION, END_CONDITION, GOTO, MULT,
     FUNCTION, ARG_COUNT, ARGUMENT, CALL, END_FUNCTION, ASSIGN_ADD, CREATE_ARRAY, CREATE_DIMENSIONAL_ARRAY,
     CREATE_OR_PUSH, GET_FROM, RETURN, PARSE_BREAK, PARSE_CONTINUE, UNARY_MINUS, INCREMENT, GET_FIELD_FROM,
-    CALL_FROM, DIV, MOD, RANGE;
+    CALL_FROM, DIV, MOD, RANGE, ADD_METHOD;
 
     @Override
     public String toString() {
@@ -76,6 +76,10 @@ public enum Commands {
                 return "div";
             case MOD:
                 return "mod";
+            case RANGE:
+                return "range";
+            case ADD_METHOD:
+                return "add_method";
         }
 
         return "";
