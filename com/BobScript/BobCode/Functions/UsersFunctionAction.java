@@ -49,18 +49,17 @@ public class UsersFunctionAction extends FunctionAction {
      * @param startPosition first body element index
      * @param argumentsInfo information about arguments
      * @param parentFunctionStackSize index in size of function, that it was declared in
+     * @param isMethod Is it method or simple function?
      */
-    public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo, int parentFunctionStackSize) {
+    public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo, int parentFunctionStackSize, boolean isMethod) {
         isBuiltin = false;
         this.startPosition = startPosition;
         this.argumentsInfo = argumentsInfo;
         this.parentFunctionStackSize = parentFunctionStackSize;
+        if (isMethod)
+            thisInfo = new ArgumentInfo("this", null);
     }
 
-    public UsersFunctionAction(int startPosition, ArrayList<ArgumentInfo> argumentsInfo, int parentFunctionStackSize, boolean isMethod) {
-        this(startPosition, argumentsInfo, parentFunctionStackSize);
-        thisInfo = new ArgumentInfo("this",null);
-    }
 
     @Override
     public void Action(InterpreterInfo info) {

@@ -17,25 +17,37 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Класс для представления информации для типа
+ * Class for representation type
  */
 public class TypeInfo {
     /**
-     * методы класса
+     * types methods
      */
     private HashMap<String, FunctionAction> methods = new HashMap<>();
     /**
-     * Статические поля
+     * types fields
      */
     private HashMap<String, StackData> staticFields = new HashMap<>();
     /**
-     * поля объекта
+     * instance fields
      */
     private ArrayList<String> fields = new ArrayList<>();
 
+    /**
+     * string typeInfo
+     */
     public static TypeInfo stringTypeInfo;
+    /**
+     * array typeInfo
+     */
     public static TypeInfo arrayTypeInfo;
+    /**
+     * File typeInfo
+     */
     public static TypeInfo fileTypeInfo;
+    /**
+     * Range typeInfo
+     */
     public static TypeInfo rangeTypeInfo;
 
     static {
@@ -72,40 +84,78 @@ public class TypeInfo {
         rangeTypeInfo.methods = methods;
     }
 
+    /**
+     * Simple constructor
+     */
     public TypeInfo() {
 
     }
 
+    /**
+     * Constructor with parameters
+     * @param methods HashMap with methods
+     * @param staticFields HashMap with static fields
+     * @param fields ArrayList with fields names
+     */
     public TypeInfo(HashMap<String, FunctionAction> methods, HashMap<String, StackData> staticFields, ArrayList<String> fields) {
         this.methods = methods;
         this.staticFields = staticFields;
         this.fields = fields;
     }
 
+    /**
+     * Gets methods
+     * @return methods
+     */
     public HashMap<String, FunctionAction> getMethods() {
         return methods;
     }
 
+    /**
+     * Sets methods
+     * @param methods new methods value
+     */
     public void setMethods(HashMap<String, FunctionAction> methods) {
         this.methods = methods;
     }
 
+    /**
+     * Gets static fields
+     * @return static fields
+     */
     public HashMap<String, StackData> getStaticFields() {
         return staticFields;
     }
 
+    /**
+     * Sets static fields
+     * @param staticFields new static fields
+     */
     public void setStaticFields(HashMap<String, StackData> staticFields) {
         this.staticFields = staticFields;
     }
 
+    /**
+     * Gets fields names
+     * @return fields names
+     */
     public ArrayList<String> getFields() {
         return fields;
     }
 
+    /**
+     * Sets fields names
+     * @param fields new fields names
+     */
     public void setFields(ArrayList<String> fields) {
         this.fields = fields;
     }
 
+    /**
+     * Gets method
+     * @param name method name
+     * @return null, if there isn't method with this name
+     */
     public FunctionAction getMethod(String name) {
         return (!methods.containsKey(name)) ? null : methods.get(name);
     }

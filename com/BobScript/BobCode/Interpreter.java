@@ -710,10 +710,8 @@ public class Interpreter {
             }
 
             UsersFunctionAction newFunction;
-            if (currentCommand.getArgs().length == 3)
-                newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize, true);
-            else
-                newFunction= new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize);
+            newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize,
+                    currentCommand.getArgs().length == 3);
 
             // let it be.
             if (!Character.isDigit(name.charAt(0)) && !info.functions.containsKey(name))

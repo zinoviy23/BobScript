@@ -132,7 +132,7 @@ public class TreeParser {
                     }
                     TreeNode operation;
                     if (isUnaryLeft) {
-                        operation = new UnaryNode(nodeRight, tk.getToken());;
+                        operation = new UnaryNode(nodeRight, tk.getToken());
                     }
                     else {
                         OperationNode op = new OperationNode(tk.getToken());
@@ -355,8 +355,7 @@ public class TreeParser {
 
                 case "return": {
                     line.remove(index);
-                    ReturnNode returnNode = new ReturnNode(init(line));
-                    return returnNode;
+                    return new ReturnNode(init(line));
                 }
 
                 case "array": {

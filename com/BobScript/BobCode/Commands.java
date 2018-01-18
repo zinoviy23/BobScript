@@ -2,9 +2,40 @@ package com.BobScript.BobCode;
 
 /**
  * Created by zinov on 20.02.2016.
+ * Enum for commands
  */
 public enum Commands {
-    EXIT, PUSH, ASSIGN, DELETE, ADD, SUB, LESSER, GREATER, EQUAL, CONDITION, END_CONDITION, GOTO, MULT,
+
+    /**
+     * Exit command
+     */
+    EXIT,
+    /**
+     * Push command, push element in stack <br>
+     *     push type data
+     */
+    PUSH,
+    /**
+     * Assign first value with second
+     */
+    ASSIGN,
+    /**
+     * Delete variable
+     */
+    DELETE,
+    /**
+     * Add first and second values and push result at stack
+     */
+    ADD,
+    /**
+     * First value - second value and result at stack
+     */
+    SUB,
+    LESSER,
+    GREATER,
+    EQUAL,
+    CONDITION,
+    END_CONDITION, GOTO, MULT,
     FUNCTION, ARG_COUNT, ARGUMENT, CALL, END_FUNCTION, ASSIGN_ADD, CREATE_ARRAY, CREATE_DIMENSIONAL_ARRAY,
     CREATE_OR_PUSH, GET_FROM, RETURN, PARSE_BREAK, PARSE_CONTINUE, UNARY_MINUS, INCREMENT, GET_FIELD_FROM,
     CALL_FROM, DIV, MOD, RANGE, ADD_METHOD;
