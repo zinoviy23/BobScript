@@ -1,10 +1,10 @@
 package com.BobScript.BobCode.Types;
 
-import com.BobScript.BobCode.Functions.BuiltinMethods.Array.AddMethodAction;
-import com.BobScript.BobCode.Functions.BuiltinMethods.Array.CollectMethodAction;
-import com.BobScript.BobCode.Functions.BuiltinMethods.Array.ConvertMethodAction;
-import com.BobScript.BobCode.Functions.BuiltinMethods.Array.ForEachMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Array.*;
 import com.BobScript.BobCode.Functions.BuiltinMethods.File.ReadLineMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Int.IsEvenMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Int.IsOddMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Int.IsZeroMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.JoinMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.LengthMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.SplitMethodAction;
@@ -34,6 +34,11 @@ public class TypeInfo {
     private ArrayList<String> fields = new ArrayList<>();
 
     /**
+     * Constructor of class
+     */
+    private FunctionAction constructor;
+
+    /**
      * string typeInfo
      */
     public static TypeInfo stringTypeInfo;
@@ -49,6 +54,12 @@ public class TypeInfo {
      * Range typeInfo
      */
     public static TypeInfo rangeTypeInfo;
+
+    /**
+     * Int typeInfo
+     */
+    public static TypeInfo intTypeInfo;
+
 
     static {
         stringTypeInfo = new TypeInfo();
@@ -69,6 +80,7 @@ public class TypeInfo {
         methods.put("collect", new CollectMethodAction());
         methods.put("toStr", new ToStrMethodAction());
         arrayTypeInfo.methods = methods;
+        arrayTypeInfo.constructor = new ArrayConstructorAction();
 
         fileTypeInfo = new TypeInfo();
         methods = new HashMap<>();
@@ -82,6 +94,13 @@ public class TypeInfo {
         methods = new HashMap<>();
         methods.put("foreach", new com.BobScript.BobCode.Functions.BuiltinMethods.Range.ForEachMethodAction());
         rangeTypeInfo.methods = methods;
+
+        intTypeInfo = new TypeInfo();
+        methods = new HashMap<>();
+        methods.put("odd?", new IsOddMethodAction());
+        methods.put("even?", new IsEvenMethodAction());
+        methods.put("zero?", new IsZeroMethodAction());
+        intTypeInfo.methods = methods;
     }
 
     /**
@@ -158,5 +177,38 @@ public class TypeInfo {
      */
     public FunctionAction getMethod(String name) {
         return (!methods.containsKey(name)) ? null : methods.get(name);
+    }
+
+    /**
+     * Add method to type
+     * @param name Name of method
+     * @param functionAction Function action
+     */
+    public void addFunction(String name, FunctionAction functionAction) {
+        methods.put(name, functionAction);
+    }
+
+    /**
+     * Add field to type
+     * @param field field's name
+     */
+    public void addField(String field) {
+        fields.add(field);
+    }
+
+    /**
+     * Gets type constructor
+     * @return current constructor
+     */
+    public FunctionAction getConstructor() {
+        return constructor;
+    }
+
+    /**
+     * Set type constructor
+     * @param constructor new constructor
+     */
+    public void setConstructor(FunctionAction constructor) {
+        this.constructor = constructor;
     }
 }

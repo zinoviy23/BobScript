@@ -56,7 +56,7 @@ public class OperationNode extends TreeNode {
     @Override
     public Command[] compile() {
         ArrayList<Command> res = new ArrayList<>();
-        if (!operation.equals("=") || (left instanceof ArrayElementNode))
+        if (!operation.equals("=") || (left instanceof ArrayElementNode) || left instanceof OperationNode )
             res.addAll(Arrays.asList(left.compile()));
         if (!operation.equals("."))
             res.addAll(Arrays.asList(right.compile()));

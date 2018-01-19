@@ -35,9 +35,14 @@ public class StackData {
      * @return
      */
     public  FunctionAction getMethod(String name) {
+        //System.out.println(name + ' ' + this);
         if (methods.containsKey(name))
             return methods.get(name);
         return typeInfo.getMethod(name);
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public void setFields(HashMap<String, StackData> fields) {
@@ -59,6 +64,7 @@ public class StackData {
         type = newValue.getType();
         typeInfo = newValue.typeInfo;
         methods = sd.methods;
+        fields = (HashMap<String, StackData>) sd.fields.clone();
     }
 
     public void assignPointer(StackData sd) {
@@ -79,6 +85,18 @@ public class StackData {
         this.data = data;
         this.type = type;
         this.typeInfo = typeInfo;
+    }
+
+    public TypeInfo getTypeInfo() {
+        return typeInfo;
+    }
+
+    public HashMap<String, StackData> getFields() {
+        return fields;
+    }
+
+    public HashMap<String, FunctionAction> getMethods() {
+        return methods;
     }
 
     public Object getData() { return data; }
@@ -129,6 +147,8 @@ public class StackData {
         StackData newStackData;
         switch (type) {
             case INT:
+                newStackData = ObjectsFactory.createInt((long)data);
+                break;
             case FLOAT:
                 newStackData =  new StackData(data, type);
                 break;
@@ -143,6 +163,9 @@ public class StackData {
                 break;
             case FILE:
                 newStackData = ObjectsFactory.createFile((BufferedReader)data, (String)fields.get("name").getData());
+                break;
+            case USERS:
+                newStackData = ObjectsFactory.cloneUsersObject(this);
                 break;
             default:
                 newStackData = new  StackData(data, type);

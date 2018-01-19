@@ -5,7 +5,6 @@ import com.BobScript.Parsing.AbstraxtSyntaxTree.ConstantAndVariableNodes.*;
 import com.BobScript.Support.TypeSupport;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Stack;
 
 public class TreeParser {
@@ -349,13 +348,58 @@ public class TreeParser {
                         }
                     }
                     currentParent.push(fdn);
-                    line.removeAll(index, closeIndex);
+                    line.removeAll(index, closeIndex + 1);
                     return null;
                 }
 
                 case "return": {
                     line.remove(index);
                     return new ReturnNode(init(line));
+                }
+
+                case "class": {
+                    String name = line.get(index + 1).getToken();
+                    ClassDeclarationNode cdn = new ClassDeclarationNode(name);
+                    currentParent.push(cdn);
+                    return null;
+                }
+
+                case "field": {
+                    ArrayList<String> fields = new ArrayList<>();
+                    for (int i = index + 1; i < line.size(); i++) {
+                        if (!line.get(i).getToken().equals(","))
+                            fields.add(line.get(i).getToken());
+                    }
+
+                    FieldNode fieldNode = new FieldNode();
+                    fieldNode.setFields(fields);
+                    return fieldNode;
+                }
+
+                case "new": {
+                    //System.out.println(line);
+                    String className = line.get(index + 1).getToken();  // TODO: in the future there is must be dot cheking and etc
+                    NewNode newNode = new NewNode(className);
+
+
+                    int openParenthesisIndex;
+                    for (openParenthesisIndex = index + 2; openParenthesisIndex < line.size(); openParenthesisIndex++) {
+                        if (line.get(openParenthesisIndex).getToken().equals("("))
+                            break;
+                    }
+
+                    int closeIndex = line.getCloseParenthesis(openParenthesisIndex);
+                    Operand arguments = line.extractFromParenthesis(openParenthesisIndex, closeIndex);
+                    //System.out.println("Arguments" + arguments);
+                    TreeNode comaNode = init(arguments);
+                    newNode.initArguments(comaNode);
+
+                    line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                    tmp.add(newNode);
+
+                    line.removeAll(index + 1, closeIndex + 1);
+                    //System.out.println(line);
+                    return init(line);
                 }
 
                 case "array": {

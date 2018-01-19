@@ -38,7 +38,7 @@ public enum Commands {
     END_CONDITION, GOTO, MULT,
     FUNCTION, ARG_COUNT, ARGUMENT, CALL, END_FUNCTION, ASSIGN_ADD, CREATE_ARRAY, CREATE_DIMENSIONAL_ARRAY,
     CREATE_OR_PUSH, GET_FROM, RETURN, PARSE_BREAK, PARSE_CONTINUE, UNARY_MINUS, INCREMENT, GET_FIELD_FROM,
-    CALL_FROM, DIV, MOD, RANGE, ADD_METHOD;
+    CALL_FROM, DIV, MOD, RANGE, ADD_METHOD, CLASS, END_CLASS, FIELD, CREATE_INSTANCE;
 
     @Override
     public String toString() {
@@ -111,6 +111,14 @@ public enum Commands {
                 return "range";
             case ADD_METHOD:
                 return "add_method";
+            case CLASS:
+                return "class";
+            case FIELD:
+                return "field";
+            case END_CLASS:
+                return "end_class";
+            case CREATE_INSTANCE:
+                return "create_instance";
         }
 
         return "";

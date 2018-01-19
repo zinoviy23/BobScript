@@ -2,6 +2,7 @@ package com.BobScript.BobCode.Functions.BuiltInFunctions;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
+import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
@@ -21,7 +22,7 @@ public class ParseIntAction extends FunctionAction {
         if (st.getType() != Type.STRING)
             return;
         else {
-            info.stack.push(new StackData(Long.parseLong((String)st.getData()),Type.INT));
+            info.stack.push(ObjectsFactory.createInt(Long.parseLong((String)st.getData())));
         }
     }
 }

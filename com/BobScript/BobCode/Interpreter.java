@@ -21,12 +21,15 @@ import org.jetbrains.annotations.Nullable;
 public class Interpreter {
     private InterpreterInfo info;
     private CommandAction[] commandActions;
+    private Stack<TypeInfo> declaredClasses;
 
     public Interpreter() {
         info = new InterpreterInfo();
         info.interpreter = this;
+        declaredClasses = new Stack<>();
         initCommandActions();
         initBuiltInFunctions();
+        initTypes();
         Log.setInfo(info);
     }
 
@@ -39,6 +42,15 @@ public class Interpreter {
         info.functions.put("random", new RandomAction());
         info.functions.put("createNArray", new CreateNArrayAction());
         info.functions.put("open", new OpenFunctionAction());
+    }
+
+    /**
+     * Initialize builtin classes
+     */
+    private void initTypes() {
+        info.types.put("JStr", TypeInfo.stringTypeInfo);
+        info.types.put("Int", TypeInfo.intTypeInfo);
+        info.types.put("Array", TypeInfo.arrayTypeInfo);
     }
 
     // иницилизирует действия команд
@@ -80,11 +92,15 @@ public class Interpreter {
         commandActions[Commands.DIV.ordinal()] = new DivAction();
         commandActions[Commands.RANGE.ordinal()] = new RangeAction();
         commandActions[Commands.ADD_METHOD.ordinal()] = new AddMethodAction();
+        commandActions[Commands.CLASS.ordinal()] = new ClassAction();
+        commandActions[Commands.END_CLASS.ordinal()] = new EndClassAction();
+        commandActions[Commands.FIELD.ordinal()] = new FieldAction();
+        commandActions[Commands.CREATE_INSTANCE.ordinal()] = new CreateInstanceAction();
     }
 
     private Command[] currentProgram;
 
-    boolean errorExit = false;
+    private boolean errorExit = false;
 
     // run commands
     public int execute(Command[] program) {
@@ -167,7 +183,7 @@ public class Interpreter {
             switch (pushParam) {
                 // integer
                 case 'i':
-                    info.stack.add(new StackData(pushData, Type.INT));
+                    info.stack.add(ObjectsFactory.createInt((long) pushData));
                     break;
                 // float
                 case 'f':
@@ -188,13 +204,6 @@ public class Interpreter {
                     break;
                 // variable
                 case 'v': {
-                    /*if (info.variables.containsKey(info.functionStackSize + "#" + pushData)) {
-                        info.stack.add(info.variables.get(info.functionStackSize + "#" + pushData));
-                    } else if (info.variables.containsKey(pushData)) {
-                        info.stack.add(info.variables.get(pushData));
-                    }  else if(info.functions.containsKey(pushData)) {
-                        info.stack.push(ObjectsFactory.createFunction(info.functions.get(pushData)));
-                    }*/
                     StackData tmp;
                     if (info.functionStackSize != 0 && (tmp = info.functionStack.peek().getVariable((String) pushData, info)) != null) {
                         info.stack.add(tmp);
@@ -250,7 +259,7 @@ public class Interpreter {
             StackData answ;
 
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
-                answ = new StackData((long)a.getData() + (long)b.getData(), Type.INT);
+                answ = ObjectsFactory.createInt((long)a.getData() + (long)b.getData());
             } else if ((a.getType() == Type.FLOAT && b.getType() == Type.FLOAT)
                     || (a.getType() == Type.FLOAT && b.getType() == Type.INT)
                     || (a.getType() == Type.INT && b.getType() == Type.FLOAT)) {
@@ -403,7 +412,7 @@ public class Interpreter {
             StackData answ = new StackData();
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
                 long tmpA = (long)a.getData(), tmpB = (long)b.getData();
-                answ = new StackData(tmpA * tmpB, Type.INT);
+                answ = ObjectsFactory.createInt(tmpA * tmpB);
             } else if (a.getType() == Type.FLOAT && b.getType() == Type.FLOAT) {
                 double tmpA = (double)a.getData(), tmpB = (double)b.getData();
                 answ = new StackData(tmpA * tmpB, Type.FLOAT);
@@ -433,7 +442,7 @@ public class Interpreter {
                     Log.printError("Error: division by zero" + currentCommand);
                     return CommandResult.ERROR;
                 }
-                answ = new StackData(tmpA / tmpB, Type.INT);
+                answ = ObjectsFactory.createInt(tmpA / tmpB);
             }
 
             info.stack.push(answ);
@@ -459,7 +468,7 @@ public class Interpreter {
                     Log.printError("Error: division by zero" + currentCommand);
                     return CommandResult.ERROR;
                 }
-                answ = new StackData(tmpA % tmpB, Type.INT);
+                answ = ObjectsFactory.createInt(tmpA % tmpB);
             }
 
             info.stack.push(answ);
@@ -711,13 +720,16 @@ public class Interpreter {
 
             UsersFunctionAction newFunction;
             newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize,
-                    currentCommand.getArgs().length == 3);
+                    currentCommand.getArgs().length == 3 || !declaredClasses.empty());
+            if (!declaredClasses.empty())
+                declaredClasses.peek().addFunction(name, newFunction);
+
 
             // let it be.
-            if (!Character.isDigit(name.charAt(0)) && !info.functions.containsKey(name))
+            if ((Character.isDigit(name.charAt(0)) || !info.functions.containsKey(name)) && declaredClasses.empty())
                 info.functions.put(name, newFunction);
-            else if (Character.isDigit(name.charAt(0)))
-                info.functions.put(name, newFunction);
+            //else if (Character.isDigit(name.charAt(0)))
+              //  info.functions.put(name, newFunction);
 
             int balance = 0;
             for (int i = info.commandIndex; i < currentProgram.length; i++) {
@@ -823,7 +835,7 @@ public class Interpreter {
             }
             StackData sd = info.stack.pop();
             if (sd.getType() == Type.INT) {
-                info.stack.push(new StackData(-(long)sd.getData(), Type.INT));
+                info.stack.push(ObjectsFactory.createInt(-(long)sd.getData()));
             }
             else if (sd.getType() == Type.FLOAT) {
                 info.stack.push(new StackData(-(double)sd.getData(), Type.FLOAT));
@@ -869,21 +881,13 @@ public class Interpreter {
             }
             StackData obj = info.stack.pop();
             String field = (String)currentCommand.getArgs()[0];
-            switch (field) {
-                case "length":
-                    if (obj.getType() != Type.ARRAY) {
-                        Log.printError("Nothing length");
-                        return CommandResult.ERROR;
-                    }
-                    info.stack.push(new StackData((long)((ArrayList<StackData>)obj.getData()).size(), Type.INT));
-                    break;
-                case "str":
-                    if (obj.getType() != Type.NULL)
-                        info.stack.push(new StackData(obj.getData().toString(), Type.STRING));
-                    else {
-                        Log.printError("NullPointerException");
-                        return CommandResult.ERROR;
-                    }
+            StackData tmp;
+            if ((tmp = obj.getField(field)) != null) {
+                info.stack.push(tmp);
+            }
+            else {
+                Log.printError("Error! nothing field " + field + " in " + obj);
+                return CommandResult.ERROR;
             }
             return CommandResult.OK;
         }
@@ -967,6 +971,46 @@ public class Interpreter {
             return CommandResult.OK;
         }
     }
+
+    private class ClassAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            TypeInfo newType = new TypeInfo();
+            declaredClasses.push(newType);
+            info.types.put((String) currentCommand.getArgs()[0], newType);
+            return CommandResult.OK;
+        }
+    }
+
+    private class EndClassAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            declaredClasses.pop();
+            return CommandResult.OK;
+        }
+    }
+
+    private class FieldAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            declaredClasses.peek().addField((String) currentCommand.getArgs()[0]);
+            return CommandResult.OK;
+        }
+    }
+
+    private class CreateInstanceAction implements CommandAction {
+        @Override
+        public CommandResult Action(Command currentCommand) {
+            TypeInfo type = info.types.get((String) currentCommand.getArgs()[0]);
+            if (type == null) {
+                Log.printError("Error! Nothing classes with name " + (String) currentCommand.getArgs()[0]);
+                return CommandResult.ERROR;
+            }
+            info.stack.push(ObjectsFactory.createObject(type, (int) currentCommand.getArgs()[1], info));
+            return CommandResult.OK;
+        }
+    }
+
 
     public Stack<StackData> getStack() {
         return info.stack;

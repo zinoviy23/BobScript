@@ -14,7 +14,7 @@ public class Operand {
      */
     public static String[] keywords = {"var", "if", "end", "while", "func",
             "return", "delete", "for", "array", "break", "continue",
-    "else", "elif", "do", "void"};
+    "else", "elif", "do", "void", "class", "field", "new"};
 
     private static Set<String> keywordsSet;
 
@@ -45,8 +45,11 @@ public class Operand {
             }
             else if (isLatter(operand.charAt(i))) {
                 int ind = i + 1;
-                while (ind < operand.length() && (isLatter(operand.charAt(ind)) || isDigit(operand.charAt(ind)))) {
+                while (ind < operand.length() && (isLatter(operand.charAt(ind)) || isDigit(operand.charAt(ind))
+                        || operand.charAt(ind) == '?' || operand.charAt(ind) == '!')) {
                     ind++;
+                    if (operand.charAt(ind - 1) == '?' || operand.charAt(ind - 1) == '!')
+                        break;
                 }
                 String currentOperand = operand.substring(i, ind);
                 addToken(currentOperand, getType(currentOperand),
@@ -358,6 +361,10 @@ public class Operand {
             return 2000;
         if (s.equals("void"))
             return 1;
+        if (s.equals("do"))
+            return 1500;
+        if (s.equals("new"))
+            return 300;
         if (isKeyword(s))
             return 1000;
         return 1;

@@ -35,6 +35,9 @@ public class ToStrMethodAction extends FunctionAction {
      * @return string, that represent object
      */
     public static String ObjectToString(StackData obj) {
+        if (obj.getType() == Type.USERS) {
+            return "<USERS OBJECT>";
+        }
         if (obj.getType() != Type.ARRAY) {
             if (obj.getType() != Type.NULL)
                 return obj.getData().toString();

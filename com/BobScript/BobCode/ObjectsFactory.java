@@ -3,10 +3,12 @@ package com.BobScript.BobCode;
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.Types.Range;
 import com.BobScript.BobCode.Types.TypeInfo;
+import com.sun.deploy.security.ValidationState;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Фабрика объектов
@@ -45,5 +47,41 @@ public class ObjectsFactory {
 
     public static StackData createRange(long start, long end) {
         return new StackData(new Range(start, end), Type.RANGE, TypeInfo.rangeTypeInfo);
+    }
+
+    public static StackData createInt(long value) {
+        return new StackData(value, Type.INT, TypeInfo.intTypeInfo);
+    }
+
+    public static StackData createObject(TypeInfo type, int arguments, InterpreterInfo info) {
+        StackData data;
+        if (type == TypeInfo.arrayTypeInfo)
+            data = ObjectsFactory.createArray(info, 0);
+        else
+            data = new StackData(null, Type.USERS, type);
+        HashMap<String, StackData> fields = new HashMap<>();
+        for (String s : type.getFields()) {
+            fields.put(s, new StackData(null, Type.NULL));
+        }
+        data.setFields(fields);
+
+        FunctionAction constructor = type.getConstructor();
+
+        if (constructor == null || constructor.getArgumentsCount() != arguments) {
+            // TODO: nothing, if constructor == null
+//            TODO: Error, if wrong arguments count
+        } else {
+            info.stack.push(data);
+            info.interpreter.callFunction(constructor);
+        }
+
+        return data;
+    }
+
+    public static StackData cloneUsersObject(StackData obj) {
+        StackData newObj = new StackData(null, Type.USERS, obj.getTypeInfo());
+        newObj.setFields((HashMap<String, StackData>) obj.getFields().clone());
+
+        return newObj;
     }
 }

@@ -2,6 +2,7 @@ package com.BobScript.BobCode.Functions.BuiltInFunctions;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
+import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
@@ -25,6 +26,6 @@ public class RandomAction extends FunctionAction {
         StackData r = info.stack.pop();
         long lValue = (long)l.getData();
         long rValue = (long)r.getData();
-        info.stack.push(new StackData(Math.abs(rand.nextLong()) % (rValue - lValue) + lValue, Type.INT));
+        info.stack.push(ObjectsFactory.createInt(Math.abs(rand.nextLong()) % (rValue - lValue) + lValue));
     }
 }
