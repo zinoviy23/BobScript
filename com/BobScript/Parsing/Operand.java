@@ -105,9 +105,16 @@ public class Operand {
                     ind++;
                 }
                 String currentOperand = operand.substring(i, ind);
-                //if (currentOperand.equals(","))
-                    //addToken(currentOperand, Token.TokenTypes.DELIMITER, 0);
-                //else
+                if (tokens.get(tokens.size() - 1).getToken().equals("op")) {
+                    String current = "op" + currentOperand;
+                    tokens.set(tokens.size() - 1, new Token(current, Token.TokenTypes.NONE,
+                            getOperatorPriority(current, isLastDelimiter()) + pr));
+                } else if (tokens.get(tokens.size() - 1).getToken().equals("rop")) {
+                    String current = "rop" + currentOperand;
+                    tokens.set(tokens.size() - 1, new Token(current, Token.TokenTypes.NONE,
+                            getOperatorPriority(current, isLastDelimiter()) + pr));
+                }
+                else
                     addToken(currentOperand, Token.TokenTypes.DELIMITER,
                             getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
                 i = ind - 1;
@@ -262,7 +269,8 @@ public class Operand {
         return tokens.size() < 1 || (tokens.get(tokens.size() - 1).isDelimiter()
                 || tokens.get(tokens.size() - 1).isKeyword()) &&
                 !tokens.get(tokens.size() - 1).getToken().equals("]") &&
-                !tokens.get(tokens.size() - 1).getToken().equals(")");
+                !tokens.get(tokens.size() - 1).getToken().equals(")") &&
+                !tokens.get(tokens.size() - 1).getToken().equals("new");
     }
 
     @Override

@@ -540,6 +540,9 @@ public class Interpreter {
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
                 long tmpA = (long)a.getData(), tmpB = (long)b.getData();
                 answ = new StackData(tmpA == tmpB, Type.BOOLEAN);
+            } else if (a.getType() == Type.FLOAT && b.getType() == Type.FLOAT) {
+                double tmpA = (double)a.getData(), tmpB = (double)b.getData();
+                answ = new StackData(tmpA == tmpB, Type.BOOLEAN);
             }
 
             info.stack.push(answ);
@@ -721,8 +724,12 @@ public class Interpreter {
             UsersFunctionAction newFunction;
             newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize,
                     currentCommand.getArgs().length == 3 || !declaredClasses.empty());
-            if (!declaredClasses.empty())
-                declaredClasses.peek().addFunction(name, newFunction);
+            if (!declaredClasses.empty()) {
+                if (!name.equals("new"))
+                    declaredClasses.peek().addFunction(name, newFunction);
+                else
+                    declaredClasses.peek().setConstructor(newFunction);
+            }
 
 
             // let it be.

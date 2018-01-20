@@ -100,14 +100,16 @@ public class TypeInfo {
         methods.put("odd?", new IsOddMethodAction());
         methods.put("even?", new IsEvenMethodAction());
         methods.put("zero?", new IsZeroMethodAction());
+        methods.put("toStr", new ToStrMethodAction());
         intTypeInfo.methods = methods;
     }
 
     /**
      * Simple constructor
+     * extend type from Object
      */
     public TypeInfo() {
-
+        methods.put("toStr", new ToStrMethodAction());
     }
 
     /**

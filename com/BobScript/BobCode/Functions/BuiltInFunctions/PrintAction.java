@@ -17,8 +17,10 @@ public class PrintAction extends FunctionAction {
 
     @Override
     public void Action(InterpreterInfo info) {
-        StackData tmp = info.stack.pop();
-        System.out.print(ToStrMethodAction.ObjectToString(tmp));
+        StackData tmp = info.stack.peek();
+        FunctionAction toStr = tmp.getMethod("toStr");
+        info.interpreter.callFunction(toStr);
+        System.out.print(info.stack.pop().getData());
     }
 
 }

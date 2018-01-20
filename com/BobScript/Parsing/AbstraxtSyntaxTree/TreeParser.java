@@ -308,6 +308,7 @@ public class TreeParser {
                 }
 
                 case "func": {
+                    //System.out.println(line);
                     String name = line.get(index + 1).getToken();
                     FunctionDeclarationNode fdn;
                     int nameEndIndex;
@@ -331,6 +332,7 @@ public class TreeParser {
 
                     int closeIndex = line.getCloseParenthesis(nameEndIndex);
                     Operand arguments = line.extractFromParenthesis(nameEndIndex, closeIndex);
+                    //System.out.println(arguments);
                     for (int i = 0; i < arguments.size(); i++) {
                         if (!arguments.get(i).getToken().equals(",")) {
                             if (i < arguments.size() - 2 && arguments.get(i + 1).getToken().equals(":")) {
@@ -349,6 +351,7 @@ public class TreeParser {
                     }
                     currentParent.push(fdn);
                     line.removeAll(index, closeIndex + 1);
+                    //System.out.println(line);
                     return null;
                 }
 
