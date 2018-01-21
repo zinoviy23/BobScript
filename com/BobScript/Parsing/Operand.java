@@ -109,11 +109,11 @@ public class Operand {
                     String current = "op" + currentOperand;
                     tokens.set(tokens.size() - 1, new Token(current, Token.TokenTypes.NONE,
                             getOperatorPriority(current, isLastDelimiter()) + pr));
-                } else if (tokens.get(tokens.size() - 1).getToken().equals("rop")) {
+                } /*else if (tokens.get(tokens.size() - 1).getToken().equals("rop")) {
                     String current = "rop" + currentOperand;
                     tokens.set(tokens.size() - 1, new Token(current, Token.TokenTypes.NONE,
                             getOperatorPriority(current, isLastDelimiter()) + pr));
-                }
+                } */
                 else
                     addToken(currentOperand, Token.TokenTypes.DELIMITER,
                             getOperatorPriority(currentOperand, isLastDelimiter()) + pr);

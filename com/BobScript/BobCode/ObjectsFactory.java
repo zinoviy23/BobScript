@@ -84,4 +84,8 @@ public class ObjectsFactory {
 
         return newObj;
     }
+
+    public static StackData createBoolean(boolean value) {
+        return new StackData(value, Type.BOOLEAN, TypeInfo.booleanTypeInfo);
+    }
 }

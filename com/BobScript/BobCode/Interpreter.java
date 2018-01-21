@@ -200,7 +200,7 @@ public class Interpreter {
                     break;
                 // boolean
                 case 'b':
-                    info.stack.add(new StackData(pushData, Type.BOOLEAN));
+                    info.stack.add(ObjectsFactory.createBoolean((boolean) pushData));
                     break;
                 // variable
                 case 'v': {
@@ -238,7 +238,10 @@ public class Interpreter {
             }
             StackData result = info.stack.pop();
             StackData variablePointer = info.stack.pop();
-            variablePointer.assignCopy(result);
+            //if (result.getType() == Type.USERS)
+              //  variablePointer.assignPointer(result);
+            //else
+                variablePointer.assignCopy(result);
 
             return CommandResult.OK;
         }
@@ -260,27 +263,31 @@ public class Interpreter {
 
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
                 answ = ObjectsFactory.createInt((long)a.getData() + (long)b.getData());
+                info.stack.push(answ);
             } else if ((a.getType() == Type.FLOAT && b.getType() == Type.FLOAT)
                     || (a.getType() == Type.FLOAT && b.getType() == Type.INT)
                     || (a.getType() == Type.INT && b.getType() == Type.FLOAT)) {
 
                 double tmpA = Double.parseDouble(a.getData().toString()), tmpB = Double.parseDouble(b.getData().toString());
                 answ = new StackData(tmpA + tmpB, Type.FLOAT);
+                info.stack.push(answ);
             } else if (a.getType() == Type.STRING || b.getType() == Type.STRING) {
-                answ = ObjectsFactory.createString(ToStrMethodAction.ObjectToString(a) + ToStrMethodAction.ObjectToString(b));
-            } else if (a.getType() == Type.ARRAY && b.getType() == Type.ARRAY) {
-                ArrayList<StackData> newArray = new ArrayList<>();
-                for (StackData el : (ArrayList<StackData>)a.getData())
-                    newArray.add(el.clone());
-                for (StackData el : (ArrayList<StackData>)b.getData())
-                    newArray.add(el.clone());
-                answ = ObjectsFactory.createArray(newArray);
+                info.stack.push(a);
+                callFunction(a.getMethod("toStr"));
+                String strA = (String) info.stack.pop().getData();
+                info.stack.push(b);
+                callFunction(b.getMethod("toStr"));
+                String strB = (String) info.stack.pop().getData();
+                answ = ObjectsFactory.createString(strA + strB);
+                info.stack.push(answ);
+            } else if (a.getTypeInfo().getOperator("+") != null) {
+                info.stack.push(b);
+                info.stack.push(a);
+                callFunction(a.getTypeInfo().getOperator("+"));
             } else {
                 Log.printError("ERROR: operator + not defined for " + a.toString() + " " + b.toString());
                 return CommandResult.ERROR;
             }
-
-            info.stack.push(answ);
 
             return CommandResult.OK;
         }
@@ -413,12 +420,16 @@ public class Interpreter {
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
                 long tmpA = (long)a.getData(), tmpB = (long)b.getData();
                 answ = ObjectsFactory.createInt(tmpA * tmpB);
+                info.stack.push(answ);
             } else if (a.getType() == Type.FLOAT && b.getType() == Type.FLOAT) {
                 double tmpA = (double)a.getData(), tmpB = (double)b.getData();
                 answ = new StackData(tmpA * tmpB, Type.FLOAT);
+                info.stack.push(answ);
+            } else if (a.getTypeInfo().getOperator("*") != null) {
+                info.stack.push(b);
+                info.stack.push(a);
+                callFunction(a.getTypeInfo().getOperator("*"));
             }
-
-            info.stack.push(answ);
 
             return CommandResult.OK;
         }
@@ -535,6 +546,7 @@ public class Interpreter {
             StackData b = info.stack.pop();
             StackData a = info.stack.pop();
 
+            //System.out.println(a + " " + b);
             StackData answ = new StackData(null, Type.NULL);
 
             if (a.getType() == Type.INT && b.getType() == Type.INT) {
@@ -543,7 +555,13 @@ public class Interpreter {
             } else if (a.getType() == Type.FLOAT && b.getType() == Type.FLOAT) {
                 double tmpA = (double)a.getData(), tmpB = (double)b.getData();
                 answ = new StackData(tmpA == tmpB, Type.BOOLEAN);
+            } else if (a.getType() == Type.NULL && b.getType() == Type.NULL) {
+                answ = new StackData(true, Type.BOOLEAN);
+            } else {
+                answ = new StackData(false, Type.BOOLEAN);
             }
+
+
 
             info.stack.push(answ);
             return CommandResult.OK;
@@ -725,10 +743,12 @@ public class Interpreter {
             newFunction = new UsersFunctionAction(info.commandIndex + 1, args, info.functionStackSize,
                     currentCommand.getArgs().length == 3 || !declaredClasses.empty());
             if (!declaredClasses.empty()) {
-                if (!name.equals("new"))
-                    declaredClasses.peek().addFunction(name, newFunction);
-                else
+                if (name.equals("new"))
                     declaredClasses.peek().setConstructor(newFunction);
+                else if (name.equals("op+"))
+                    declaredClasses.peek().addOperator("+", newFunction);
+                else
+                    declaredClasses.peek().addFunction(name, newFunction);
             }
 
 

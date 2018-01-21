@@ -2,6 +2,7 @@ package com.BobScript.BobCode.Functions.BuiltinMethods.Int;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
+import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
 import com.BobScript.BobCode.Type;
 
@@ -17,7 +18,7 @@ public class IsEvenMethodAction extends FunctionAction {
     @Override
     public void Action(InterpreterInfo info) {
         long objValue = (long)info.stack.pop().getData();
-        info.stack.push(new StackData(objValue % 2 == 0, Type.BOOLEAN));
+        info.stack.push(ObjectsFactory.createBoolean(objValue % 2 == 0));
     }
 
     @Override

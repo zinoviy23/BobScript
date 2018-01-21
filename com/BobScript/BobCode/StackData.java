@@ -35,7 +35,6 @@ public class StackData {
      * @return
      */
     public  FunctionAction getMethod(String name) {
-        //System.out.println(name + ' ' + this);
         if (methods.containsKey(name))
             return methods.get(name);
         return typeInfo.getMethod(name);
@@ -166,6 +165,9 @@ public class StackData {
                 break;
             case USERS:
                 newStackData = ObjectsFactory.cloneUsersObject(this);
+                break;
+            case BOOLEAN:
+                newStackData = ObjectsFactory.createBoolean((boolean) data);
                 break;
             default:
                 newStackData = new  StackData(data, type);

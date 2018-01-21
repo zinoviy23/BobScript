@@ -39,6 +39,11 @@ public class TypeInfo {
     private FunctionAction constructor;
 
     /**
+     * Operators of class
+     */
+    private HashMap<String, FunctionAction> operators = new HashMap<>();
+
+    /**
      * string typeInfo
      */
     public static TypeInfo stringTypeInfo;
@@ -60,6 +65,10 @@ public class TypeInfo {
      */
     public static TypeInfo intTypeInfo;
 
+    /**
+     * Boolean typeInfo
+     */
+    public static TypeInfo booleanTypeInfo;
 
     static {
         stringTypeInfo = new TypeInfo();
@@ -81,6 +90,8 @@ public class TypeInfo {
         methods.put("toStr", new ToStrMethodAction());
         arrayTypeInfo.methods = methods;
         arrayTypeInfo.constructor = new ArrayConstructorAction();
+        arrayTypeInfo.operators.put("+", new ArrayAddOperationAction());
+        arrayTypeInfo.operators.put("*", new ArrayMultOperationAction());
 
         fileTypeInfo = new TypeInfo();
         methods = new HashMap<>();
@@ -102,6 +113,11 @@ public class TypeInfo {
         methods.put("zero?", new IsZeroMethodAction());
         methods.put("toStr", new ToStrMethodAction());
         intTypeInfo.methods = methods;
+
+        booleanTypeInfo = new TypeInfo();
+        methods = new HashMap<>();
+        methods.put("toStr", new ToStrMethodAction());
+        booleanTypeInfo.methods = methods;
     }
 
     /**
@@ -212,5 +228,25 @@ public class TypeInfo {
      */
     public void setConstructor(FunctionAction constructor) {
         this.constructor = constructor;
+    }
+
+    /**
+     * Gets operator
+     * @param op operator string value
+     * @return operator function action
+     */
+    public FunctionAction getOperator(String op) {
+        if (operators.containsKey(op))
+            return operators.get(op);
+        return operators.get(op);
+    }
+
+    /**
+     * Adds operator to class
+     * @param opStr operator name
+     * @param action operator action
+     */
+    public void addOperator(String opStr, FunctionAction action) {
+        operators.put(opStr, action);
     }
 }
