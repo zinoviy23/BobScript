@@ -9,6 +9,7 @@ import com.BobScript.BobCode.StackData;
  * Class for "println" function <br>
  *     gets string, print it and goes to new line
  */
+@Deprecated
 public class PrintlnAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {

@@ -39,7 +39,14 @@ public class TreeParser {
             }
             if (!currentParent.empty()) {
                 if (tmpRes != null)
-                    currentParent.peek().addToBody(tmpRes);
+                    try {
+                        currentParent.peek().addToBody(tmpRes);
+                    } catch (Exception ex) {
+                        if (currentParent.peek() instanceof Parentable)
+                            return ((Parentable) currentParent.pop()).findRoot();
+                        else
+                            ex.printStackTrace();
+                    }
             }
             else {
                     return tmpRes;
@@ -87,7 +94,7 @@ public class TreeParser {
 
                     TreeNode nodeLeft = null, nodeRight = null;
                     boolean isUnaryLeft = false;
-                    if (left == null)
+                    if (left == null || tk.getToken().equals("++"))
                         isUnaryLeft = true;
                     else if (!left.isForParsing()) {
                         if (TypeSupport.tryInt(left.getToken()))
@@ -256,21 +263,42 @@ public class TreeParser {
             switch (tk.getToken()) {
                 case "while": {
                     line.remove(index);
-                    WhileNode whileNode = new WhileNode(init(line));
+                    init(line);
+                    //System.out.println(line);
+                    Operand condition = line.extractFrom(0, 0);
+                    WhileNode whileNode = new WhileNode(init(condition));
                     currentParent.push(whileNode);
-                    return null;
+                    if (line.size() == 1) {
+                        return null;
+                    }
+                    else {
+                        Operand body = line.extractFrom(1, 1);
+                        whileNode.addToBody(init(body));
+                        return currentParent.peek();
+                    }
                 }
 
                 case "for": {
                     line.remove(index);
                     Operand[] statements = line.split(";");
-                    Operand condition = statements[1];
-                    Operand change = statements[2];
-                    Operand initSt = statements[0];
-                    ForNode forNode = new ForNode(init(condition));
-                    forNode.setInitializationState(init(initSt));
-                    forNode.setChangeStatement(init(change));
-                    currentParent.push(forNode);
+                    if (statements.length == 3) {
+                        Operand condition = statements[1];
+                        Operand change = statements[2];
+                        Operand initSt = statements[0];
+                        ForNode forNode = new ForNode(init(condition));
+                        forNode.setInitializationState(init(initSt));
+                        currentParent.push(forNode);
+                        init(change);
+                        if (change.size() == 1)
+                            forNode.setChangeStatement(init(change));
+                        else {
+                            Operand body = change.extractFrom(1, 1);
+                            change = change.extractFrom(0, 0);
+                            forNode.setChangeStatement(init(change));
+                            forNode.addToBody(init(body));
+                            return currentParent.peek();
+                        }
+                    }
                     return null;
                 }
 
@@ -284,15 +312,44 @@ public class TreeParser {
 
                 case "if": {
                     line.remove(index);
-                    IfNode ifNode = new IfNode(init(line), null);
-                    currentParent.push(ifNode);
-                    return null;
+                    init(line);
+                    if (line.size() == 1) {
+                        IfNode ifNode = new IfNode(init(line), null);
+                        currentParent.push(ifNode);
+                        return null;
+                    } else {
+                        Operand condition = line.extractFrom(0, 0);
+                        Operand body = line.extractFrom(1, 1);
+                        IfNode ifNode = new IfNode(init(condition), null);
+                        try {
+                            ifNode.addToBody(init(body));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        ifNode.setOneLineBlock(true);
+                        currentParent.push(ifNode);
+                        return null;
+                    }
                 }
 
                 case "elif": {
                     IfNode parent = (IfNode)currentParent.pop();
                     line.remove(index);
-                    IfNode ifNode = new IfNode(init(line), parent);
+                    IfNode ifNode;
+                    init(line);
+                    if (line.size() == 1) {
+                        ifNode = new IfNode(init(line), parent);
+                    } else {
+                        Operand condition = line.extractFrom(0, 0);
+                        Operand body = line.extractFrom(1, 1);
+                        ifNode = new IfNode(init(condition), parent);
+                        try {
+                            ifNode.addToBody(init(body));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                        ifNode.setOneLineBlock(true);
+                    }
                     parent.setElseNode(ifNode);
                     currentParent.push(ifNode);
                     return null;
@@ -304,7 +361,12 @@ public class TreeParser {
                     ElseNode elseNode = new ElseNode(parent);
                     parent.setElseNode(elseNode);
                     currentParent.push(elseNode);
-                    return null;
+                    if (line.size() == 0) {
+                        return null;
+                    } else {
+                        elseNode.addToBody(init(line));
+                        return currentParent.peek();
+                    }
                 }
 
                 case "func": {
@@ -351,7 +413,18 @@ public class TreeParser {
                     }
                     currentParent.push(fdn);
                     line.removeAll(index, closeIndex + 1);
-                    //System.out.println(line);
+                    if (line.size() > 0) {
+                        if (!line.get(0).getToken().equals("void")) {
+                            Operand newLine = new Operand("return");
+                            newLine.addTokens(line);
+                            line = newLine;
+                        }
+                        else
+                            line.remove(0);
+                        //System.out.println(line);
+                        fdn.addToBody(init(line));
+                        return currentParent.peek();
+                    }
                     return null;
                 }
 
@@ -412,6 +485,10 @@ public class TreeParser {
                     line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
                     tmp.add(node);
                     return init(line);
+                }
+
+                case "pass": {
+                    return new PassNode();
                 }
 
                 case "do": {

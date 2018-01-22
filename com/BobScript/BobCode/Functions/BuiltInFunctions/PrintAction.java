@@ -1,14 +1,13 @@
 package com.BobScript.BobCode.Functions.BuiltInFunctions;
 
-import com.BobScript.BobCode.Functions.BuiltinMethods.ToStrMethodAction;
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.StackData;
-import com.BobScript.BobCode.Variable;
 
-import java.util.Map;
-import java.util.Set;
-
+/**
+ * Class for 'print' function
+ * prints argument in stdout
+ */
 public class PrintAction extends FunctionAction {
     @Override
     public int getArgumentsCount() {
@@ -20,7 +19,7 @@ public class PrintAction extends FunctionAction {
         StackData tmp = info.stack.peek();
         FunctionAction toStr = tmp.getMethod("toStr");
         info.interpreter.callFunction(toStr);
-        System.out.print(info.stack.pop().getData());
+        System.out.println(info.stack.pop().getData());
     }
 
 }

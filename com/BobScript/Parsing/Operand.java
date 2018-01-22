@@ -14,7 +14,7 @@ public class Operand {
      */
     public static String[] keywords = {"var", "if", "end", "while", "func",
             "return", "delete", "for", "array", "break", "continue",
-    "else", "elif", "do", "void", "class", "field", "new"};
+    "else", "elif", "do", "void", "class", "field", "new", "pass"};
 
     private static Set<String> keywordsSet;
 

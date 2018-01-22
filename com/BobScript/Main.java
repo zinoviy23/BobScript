@@ -23,14 +23,21 @@ public class Main {
             String line = "";
             PrintWriter tokenWriter = new PrintWriter("tokens.txt");
             FileNode root = new FileNode(fileName);
-            while ((line = reader.readLine()) != null) {
+            do {
+                line = reader.readLine();
+                if (line == null) {
+                    TreeNode tmp = parser.createNode(new Operand("pass"));
+                    root.addToBody(tmp);
+                    break;
+                }
                 Operand tmp = new Operand(line);
                 tokenWriter.println(tmp);
                 tokenWriter.flush();
                 TreeNode newTreeNode = parser.createNode(tmp);
                 if (newTreeNode != null)
                     root.addToBody(newTreeNode);
-            }
+
+            } while (line != null);
             root.debugPrint(0);
             TreeNode.deleteDebugWriter();
             tokenWriter.close();

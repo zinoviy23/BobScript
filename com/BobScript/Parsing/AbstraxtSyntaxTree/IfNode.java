@@ -11,6 +11,7 @@ public class IfNode extends ComplexNode implements Parentable {
     private TreeNode condition;
     private TreeNode elseNode;
     private IfNode parent;
+    private boolean isOneLineBlock;
 
     public IfNode(TreeNode condition, IfNode parent) {
         this.condition = condition;
@@ -27,6 +28,14 @@ public class IfNode extends ComplexNode implements Parentable {
         elseNode = tn;
     }
 
+    public boolean isOneLineBlock() {
+        return isOneLineBlock;
+    }
+
+    public void setOneLineBlock(boolean oneLineBlock) {
+        isOneLineBlock = oneLineBlock;
+    }
+
     @Override
     public TreeNode findRoot() {
         if (parent != null)
@@ -35,8 +44,11 @@ public class IfNode extends ComplexNode implements Parentable {
     }
 
     @Override
-    public void addToBody(TreeNode node) {
-        body.add(node);
+    public void addToBody(TreeNode node) throws Exception {
+        if (!isOneLineBlock)
+            body.add(node);
+        else
+            throw new Exception("Can't add to body!");
     }
 
     @Override
