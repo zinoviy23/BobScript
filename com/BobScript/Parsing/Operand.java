@@ -14,7 +14,7 @@ public class Operand {
      */
     public static String[] keywords = {"var", "if", "end", "while", "func",
             "return", "delete", "for", "array", "break", "continue",
-    "else", "elif", "do", "void", "class", "field", "new", "pass"};
+    "else", "elif", "do", "void", "class", "field", "new", "pass", "in"};
 
     private static Set<String> keywordsSet;
 
@@ -52,8 +52,13 @@ public class Operand {
                         break;
                 }
                 String currentOperand = operand.substring(i, ind);
-                addToken(currentOperand, getType(currentOperand),
-                        getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
+                if (currentOperand.equals("in")) {
+                    addToken(currentOperand, Token.TokenTypes.DELIMITER,
+                            getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
+                } else {
+                    addToken(currentOperand, getType(currentOperand),
+                            getOperatorPriority(currentOperand, isLastDelimiter()) + pr);
+                }
                 i = ind - 1;
             }
             else if (operand.charAt(i) == '(') {
@@ -167,7 +172,7 @@ public class Operand {
         for (int i = start; i <= end; i++)
         {
             newOp.addToken(tokens.get(i).copy());
-            tokens.get(i).setUsed();
+            //tokens.get(i).setUsed();
         }
 
         return newOp;
@@ -195,7 +200,7 @@ public class Operand {
         if (start < tokens.size()) {
             ret.add(this.extractFrom(start, tokens.size() - 1));
         }
-
+        //System.out.println(this);
         return ret.toArray(new Operand[ret.size()]);
     }
 
@@ -373,6 +378,8 @@ public class Operand {
             return 1500;
         if (s.equals("new"))
             return 300;
+        if (s.equals("in"))
+            return 20;
         if (isKeyword(s))
             return 1000;
         return 1;

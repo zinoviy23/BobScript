@@ -586,7 +586,7 @@ public class Interpreter {
                 return CommandResult.ERROR;
             }
             StackData a = info.stack.pop();
-            Variable variable = (Variable)info.stack.pop();
+            StackData variable = info.stack.pop();
             variable.data = (long)variable.data + (long)a.data;
 
             return CommandResult.OK;

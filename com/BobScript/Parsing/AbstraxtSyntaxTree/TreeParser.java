@@ -56,6 +56,7 @@ public class TreeParser {
     }
 
     private TreeNode init(Operand line) {
+        //System.out.println(line);
         int index = line.next();
 
         if (line.size() == 0)
@@ -88,7 +89,8 @@ public class TreeParser {
                 case ".":
                 case "++":
                 case ":":
-                case "..": {
+                case "..":
+                case "in": {
                     Token left = line.get(index - 1);
                     Token right = line.get(index + 1);
 
@@ -280,7 +282,9 @@ public class TreeParser {
 
                 case "for": {
                     line.remove(index);
+                    //System.out.println(line);
                     Operand[] statements = line.split(";");
+
                     if (statements.length == 3) {
                         Operand condition = statements[1];
                         Operand change = statements[2];
@@ -296,6 +300,22 @@ public class TreeParser {
                             change = change.extractFrom(0, 0);
                             forNode.setChangeStatement(init(change));
                             forNode.addToBody(init(body));
+                            return currentParent.peek();
+                        }
+                    } else {
+                        init(line);
+                        Operand inOperation = line.extractFrom(0, 0);
+                        ForEachNode forEachNode = new ForEachNode(init(inOperation));
+                        currentParent.push(forEachNode);
+                        if (line.size() == 1) {
+                            return null;
+                        } else {
+                            Operand body = line.extractFrom(1, 1);
+                            try {
+                                forEachNode.addToBody(init(body));
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
                             return currentParent.peek();
                         }
                     }

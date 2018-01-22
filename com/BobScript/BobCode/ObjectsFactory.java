@@ -8,6 +8,7 @@ import com.sun.deploy.security.ValidationState;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -88,4 +89,9 @@ public class ObjectsFactory {
     public static StackData createBoolean(boolean value) {
         return new StackData(value, Type.BOOLEAN, TypeInfo.booleanTypeInfo);
     }
+
+    public static StackData createIterator(Iterator<StackData> it) {
+        return new StackData(it, Type.ITERATOR, TypeInfo.iteratorTypeInfo);
+    }
+
 }

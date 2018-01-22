@@ -28,15 +28,14 @@ public class Main {
                 if (line == null) {
                     TreeNode tmp = parser.createNode(new Operand("pass"));
                     root.addToBody(tmp);
-                    break;
+                } else {
+                    Operand tmp = new Operand(line);
+                    tokenWriter.println(tmp);
+                    tokenWriter.flush();
+                    TreeNode newTreeNode = parser.createNode(tmp);
+                    if (newTreeNode != null)
+                        root.addToBody(newTreeNode);
                 }
-                Operand tmp = new Operand(line);
-                tokenWriter.println(tmp);
-                tokenWriter.flush();
-                TreeNode newTreeNode = parser.createNode(tmp);
-                if (newTreeNode != null)
-                    root.addToBody(newTreeNode);
-
             } while (line != null);
             root.debugPrint(0);
             TreeNode.deleteDebugWriter();
@@ -68,9 +67,6 @@ public class Main {
                 }
             }
 
-            //for (Command c : compiled) {
-              //  tmpWriter.println(c);
-            //}
             tmpWriter.close();
 
             Interpreter inter = new Interpreter();

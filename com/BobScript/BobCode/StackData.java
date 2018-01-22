@@ -169,6 +169,9 @@ public class StackData {
             case BOOLEAN:
                 newStackData = ObjectsFactory.createBoolean((boolean) data);
                 break;
+            case ITERATOR:
+                newStackData = ObjectsFactory.createIterator((Iterator<StackData>)data);
+                break;
             default:
                 newStackData = new  StackData(data, type);
                 break;

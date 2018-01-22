@@ -1,16 +1,17 @@
-package com.BobScript.BobCode.Functions.BuiltinMethods.String;
+package com.BobScript.BobCode.Functions.BuiltinMethods.Array;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
-import com.BobScript.BobCode.Type;
+
+import java.util.ArrayList;
 
 /**
- * Class for "length" method of string <br>
- *     returns count of characters in this string
+ * Class for "iterator" method of array
+ * gets iterator
  */
-public class LengthMethodAction extends FunctionAction {
+public class ArrayIteratorMethod extends FunctionAction {
     @Override
     public int getArgumentsCount() {
         return 0;
@@ -18,9 +19,8 @@ public class LengthMethodAction extends FunctionAction {
 
     @Override
     public void Action(InterpreterInfo info) {
-        StackData obj = info.stack.pop();
-        long len = ((String)obj.getData()).length();
-        info.stack.push(ObjectsFactory.createInt(len));
+        ArrayList<StackData> arr = (ArrayList<StackData>) info.stack.pop().getData();
+        info.stack.push(ObjectsFactory.createIterator(arr.iterator()));
     }
 
     @Override

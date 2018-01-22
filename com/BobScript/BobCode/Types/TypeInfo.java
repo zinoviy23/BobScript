@@ -1,10 +1,15 @@
 package com.BobScript.BobCode.Types;
 
 import com.BobScript.BobCode.Functions.BuiltinMethods.Array.*;
+import com.BobScript.BobCode.Functions.BuiltinMethods.File.FileLinesMethod;
 import com.BobScript.BobCode.Functions.BuiltinMethods.File.ReadLineMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Int.IsEvenMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Int.IsOddMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.Int.IsZeroMethodAction;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Iterators.HasNextIteratorMethod;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Iterators.IteratorIteratorMethod;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Iterators.NextIteratorMethod;
+import com.BobScript.BobCode.Functions.BuiltinMethods.Range.RangeIteratorMethod;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.JoinMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.LengthMethodAction;
 import com.BobScript.BobCode.Functions.BuiltinMethods.String.SplitMethodAction;
@@ -70,6 +75,11 @@ public class TypeInfo {
      */
     public static TypeInfo booleanTypeInfo;
 
+    /**
+     * Iterator typeInfo
+     */
+    public static TypeInfo iteratorTypeInfo;
+
     static {
         stringTypeInfo = new TypeInfo();
         HashMap<String, FunctionAction> methods = new HashMap<>();
@@ -88,6 +98,7 @@ public class TypeInfo {
         methods.put("add", new AddMethodAction());
         methods.put("collect", new CollectMethodAction());
         methods.put("toStr", new ToStrMethodAction());
+        methods.put("iterator", new ArrayIteratorMethod());
         arrayTypeInfo.methods = methods;
         arrayTypeInfo.constructor = new ArrayConstructorAction();
         arrayTypeInfo.operators.put("+", new ArrayAddOperationAction());
@@ -96,6 +107,7 @@ public class TypeInfo {
         fileTypeInfo = new TypeInfo();
         methods = new HashMap<>();
         methods.put("readLine", new ReadLineMethodAction());
+        methods.put("lines", new FileLinesMethod());
         ArrayList<String> fields = new ArrayList<>();
         fields.add("name");
         fileTypeInfo.fields = fields;
@@ -104,6 +116,7 @@ public class TypeInfo {
         rangeTypeInfo = new TypeInfo();
         methods = new HashMap<>();
         methods.put("foreach", new com.BobScript.BobCode.Functions.BuiltinMethods.Range.ForEachMethodAction());
+        methods.put("iterator", new RangeIteratorMethod());
         rangeTypeInfo.methods = methods;
 
         intTypeInfo = new TypeInfo();
@@ -118,6 +131,13 @@ public class TypeInfo {
         methods = new HashMap<>();
         methods.put("toStr", new ToStrMethodAction());
         booleanTypeInfo.methods = methods;
+
+        iteratorTypeInfo = new TypeInfo();
+        methods = new HashMap<>();
+        methods.put("next?", new HasNextIteratorMethod());
+        methods.put("next", new NextIteratorMethod());
+        methods.put("iterator", new IteratorIteratorMethod());
+        iteratorTypeInfo.methods = methods;
     }
 
     /**

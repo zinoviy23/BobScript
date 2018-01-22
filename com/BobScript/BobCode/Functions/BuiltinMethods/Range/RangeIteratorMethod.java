@@ -1,16 +1,14 @@
-package com.BobScript.BobCode.Functions.BuiltinMethods.String;
+package com.BobScript.BobCode.Functions.BuiltinMethods.Range;
 
 import com.BobScript.BobCode.Functions.FunctionAction;
 import com.BobScript.BobCode.InterpreterInfo;
 import com.BobScript.BobCode.ObjectsFactory;
 import com.BobScript.BobCode.StackData;
-import com.BobScript.BobCode.Type;
+import com.BobScript.BobCode.Types.Range;
 
-/**
- * Class for "length" method of string <br>
- *     returns count of characters in this string
- */
-public class LengthMethodAction extends FunctionAction {
+import java.util.ArrayList;
+
+public class RangeIteratorMethod extends FunctionAction {
     @Override
     public int getArgumentsCount() {
         return 0;
@@ -18,9 +16,8 @@ public class LengthMethodAction extends FunctionAction {
 
     @Override
     public void Action(InterpreterInfo info) {
-        StackData obj = info.stack.pop();
-        long len = ((String)obj.getData()).length();
-        info.stack.push(ObjectsFactory.createInt(len));
+        Range range = (Range) info.stack.pop().getData();
+        info.stack.push(ObjectsFactory.createIterator(range.iterator()));
     }
 
     @Override
