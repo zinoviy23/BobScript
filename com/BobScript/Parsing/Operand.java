@@ -96,7 +96,8 @@ public class Operand {
             }
             else if (isDigit(operand.charAt(i))) {
                 int ind = i + 1;
-                while (ind < operand.length() && (isDigit(operand.charAt(ind)) || operand.charAt(ind) == '.')) {
+                while (ind < operand.length() && (isDigit(operand.charAt(ind)) || operand.charAt(ind) == '.')
+                        && !(operand.charAt(ind) == '.' && ind < operand.length() - 1 && operand.charAt(ind + 1) == '.')) {
                     ind++;
                 }
                 String currentOperand = operand.substring(i, ind);

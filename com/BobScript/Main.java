@@ -17,26 +17,27 @@ public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length != 0) {
             TreeNode.initDebugWriter("tree.txt");
-            TreeParser parser = new TreeParser();
             String fileName = args[0];
+            FileNode root = new FileNode(fileName);
+            TreeParser parser = new TreeParser(root);
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line = "";
             PrintWriter tokenWriter = new PrintWriter("tokens.txt");
-            FileNode root = new FileNode(fileName);
             do {
                 line = reader.readLine();
                 if (line == null) {
-                    TreeNode tmp = parser.createNode(new Operand("pass"));
-                    root.addToBody(tmp);
+                    parser.createNode(new Operand("pass"));
+                    //root.addToBody(tmp);
                 } else {
                     Operand tmp = new Operand(line);
                     tokenWriter.println(tmp);
                     tokenWriter.flush();
-                    TreeNode newTreeNode = parser.createNode(tmp);
-                    if (newTreeNode != null)
-                        root.addToBody(newTreeNode);
+                    parser.createNode(tmp);
+                    //if (newTreeNode != null)
+                        //root.addToBody(newTreeNode);
                 }
             } while (line != null);
+            root = parser.getFile();
             root.debugPrint(0);
             TreeNode.deleteDebugWriter();
             tokenWriter.close();

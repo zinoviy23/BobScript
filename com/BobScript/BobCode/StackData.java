@@ -35,8 +35,10 @@ public class StackData {
      * @return
      */
     public  FunctionAction getMethod(String name) {
-        if (methods.containsKey(name))
+        if (methods.containsKey(name)) {
+            //System.out.println("loool");
             return methods.get(name);
+        }
         return typeInfo.getMethod(name);
     }
 
@@ -176,6 +178,8 @@ public class StackData {
                 newStackData = new  StackData(data, type);
                 break;
         }
+        newStackData.methods = methods;
+        newStackData.fields = (HashMap<String, StackData>) fields.clone();
         return newStackData;
     }
 

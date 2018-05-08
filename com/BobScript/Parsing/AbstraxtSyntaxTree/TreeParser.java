@@ -21,13 +21,19 @@ public class TreeParser {
     // пропущенная строка
     private Operand passedLine;
 
-    public TreeParser() {
+    public TreeParser(FileNode root) {
         tmp = new ArrayList<>();
         currentParent = new Stack<>();
+        currentParent.push(root);
         doSavedLineStack = new Stack<>();
     }
 
-    public TreeNode createNode(Operand line) {
+
+    public FileNode getFile() {
+        return (FileNode) currentParent.firstElement();
+    }
+
+    public TreeNode createNode(Operand line) {  // TODO: big refactoring
         //tmp.clear();
         TreeNode tmpRes = init(line);
         if (currentParent.empty())
@@ -40,10 +46,22 @@ public class TreeParser {
             if (!currentParent.empty()) {
                 if (tmpRes != null)
                     try {
+
                         currentParent.peek().addToBody(tmpRes);
                     } catch (Exception ex) {
-                        if (currentParent.peek() instanceof Parentable)
-                            return ((Parentable) currentParent.pop()).findRoot();
+                        if (currentParent.peek() instanceof Parentable) {
+                            if (currentParent.size() == 1)
+                                return ((Parentable) currentParent.pop()).findRoot();
+                            else {
+                                TreeNode currentNode = ((Parentable) currentParent.pop()).findRoot();
+                                try {
+                                    currentParent.peek().addToBody(currentNode);  // TODO: needs some refactoring and fixes
+                                    currentParent.peek().addToBody(tmpRes);
+                                } catch (Exception ex1) {
+                                    ex1.printStackTrace();
+                                }
+                            }
+                        }
                         else
                             ex.printStackTrace();
                     }
@@ -282,14 +300,18 @@ public class TreeParser {
 
                 case "for": {
                     line.remove(index);
-                    //System.out.println(line);
+                    String name = null;
+                    if (line.get(index).getToken().equals(":")) {
+                        name = line.get(index + 1).getToken();
+                        line.removeAll(index, index + 2);
+                    }
                     Operand[] statements = line.split(";");
 
                     if (statements.length == 3) {
                         Operand condition = statements[1];
                         Operand change = statements[2];
                         Operand initSt = statements[0];
-                        ForNode forNode = new ForNode(init(condition));
+                        ForNode forNode = new ForNode(init(condition), name);
                         forNode.setInitializationState(init(initSt));
                         currentParent.push(forNode);
                         init(change);
@@ -323,7 +345,16 @@ public class TreeParser {
                 }
 
                 case "break": {
-                    return new BreakNode();
+                    BreakNode node;
+                    if (line.size() > index + 1) {
+                        node = new BreakNode(line.get(index + 1).getToken());
+                        line.remove(index + 1);
+                    } else {
+                        node = new BreakNode();
+                    }
+                    line.set(index, new Token(Integer.toString(tmp.size()), Token.TokenTypes.FOR_PARSING, 0));
+                    tmp.add(node);
+                    return init(line);
                 }
 
                 case "continue": {
@@ -385,7 +416,7 @@ public class TreeParser {
                         return null;
                     } else {
                         elseNode.addToBody(init(line));
-                        return currentParent.peek();
+                        return ((Parentable)currentParent.pop()).findRoot();
                     }
                 }
 
@@ -512,15 +543,26 @@ public class TreeParser {
                 }
 
                 case "do": {
-                    //System.out.println("Line: " + line + "\n");
                     doSavedLineStack.push(line.extractFrom(0, index - 1));
                     currentParent.add(new DoBlockNode());
                     return null;
                 }
 
                 case "end": {
-                    //System.out.println("LineEnd: " + line + "\n");
+                    if (currentParent.peek() instanceof FileNode) {  // TODO: exception
+                        System.err.println("Unexpected end!");
+                        return null;
+                    }
                     if (currentParent.peek() instanceof Parentable) {
+                        if (currentParent.peek() instanceof IfNode && ((IfNode)currentParent.peek()).isOneLineBlock()) {
+                            TreeNode tmp = ((Parentable)currentParent.pop()).findRoot();
+                            try {
+                                currentParent.peek().addToBody(tmp);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            return  currentParent.peek();
+                        }
                         return ((Parentable)currentParent.pop()).findRoot();
                     }
                     if (!doSavedLineStack.empty() && currentParent.peek() instanceof DoBlockNode) {

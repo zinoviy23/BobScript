@@ -15,15 +15,17 @@ public class ForNode extends ComplexNode {
     private TreeNode condition;  // условие цикла
     private TreeNode initializationStatement;  // иницилизации в for
     private TreeNode changeStatement;
+    private String name;
 
     private ArrayList<TreeNode> initializations;
     private ArrayList<TreeNode> changes;
 
-    public ForNode(TreeNode condition) {
+    public ForNode(TreeNode condition, String name) {
         this.body = new ArrayList<>();
         this.condition = condition;
         initializations = new ArrayList<>();
         changes = new ArrayList<>();
+        this.name = name;
     }
 
 
@@ -78,7 +80,7 @@ public class ForNode extends ComplexNode {
     @Override
     public void debugPrint(int level) {
         drawLevel(level);
-        debugWriter.println("For loop");
+        debugWriter.println("For loop" + ((name == null) ? "" :  " : " + name));
 
         drawLevel(level);
         debugWriter.println("Init st:");
@@ -143,7 +145,8 @@ public class ForNode extends ComplexNode {
         res.add(new Command(Commands.END_CONDITION));
 
         for (int i = 0; i < res.size(); i++)
-            if (res.get(i).getCommand() == Commands.PARSE_BREAK) {
+            if (res.get(i).getCommand() == Commands.PARSE_BREAK &&
+                    (res.get(i).getArgs()[0].equals(name) || res.get(i).getArgs().length == 0)) {
                 res.set(i, new Command(Commands.GOTO, res.size() - i));
             }
 

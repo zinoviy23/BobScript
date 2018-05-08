@@ -212,7 +212,6 @@ public class Interpreter {
                     }else if(info.functions.containsKey(pushData)) {
                         info.stack.push(ObjectsFactory.createFunction(info.functions.get(pushData)));
                     } else {
-                    System.out.println("lol");
                     Log.printError("Error: " + currentCommand + " nothing variables");
                     return CommandResult.ERROR;
                 }
